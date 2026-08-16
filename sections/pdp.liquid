@@ -1,0 +1,1520 @@
+{% comment %}
+  PDP - Product Detail Page Section
+  Página de detalle de producto DINÁMICA - Usa el producto actual de la URL
+{% endcomment %}
+
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .pdp-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#ffffff' }};
+    padding: 10px 0 80px !important;
+  }
+
+  @media (max-width: 768px) {
+    .pdp-section-{{ section.id }} {
+      padding: 16px 0 60px !important;
+    }
+  }
+
+  .pdp-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ── Layout Grid ── */
+  .pdp-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .pdp-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  /* ── Gallery: stacked vertical ── */
+  .pdp-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pdp-gallery-image {
+    overflow: hidden;
+    border-radius: {{ section.settings.image_radius | default: 8 }}px;
+    cursor: pointer;
+    background-color: {{ section.settings.image_bg | default: '#f5f5f5' }};
+  }
+
+  .pdp-gallery-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .pdp-gallery-image:hover img {
+    transform: scale(1.03);
+  }
+
+  /* Gallery dots (mobile only) */
+  .pdp-gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  @media (min-width: 769px) {
+    .pdp-gallery-dots {
+      display: none;
+    }
+  }
+
+  .pdp-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: #ccc;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.2s;
+  }
+
+  .pdp-dot.active {
+    background: #333;
+  }
+
+  /* Mobile: horizontal scroll-snap slider */
+  @media (max-width: 768px) {
+    .pdp-gallery {
+      flex-direction: row;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 0;
+    }
+
+    .pdp-gallery::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pdp-gallery-image {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+    }
+  }
+
+  /* ── Info Card: sticky ── */
+  .pdp-info {
+    position: sticky;
+    top: 90px;
+    padding-top: 10px;
+  }
+
+  .pdp-title {
+    font-size: {{ section.settings.title_size | default: 32 }}px;
+    font-weight: {{ section.settings.title_weight | default: 600 }};
+    color: {{ section.settings.title_color | default: '#1a1a2e' }};
+    margin: 0 0 20px;
+    line-height: 1.2;
+  }
+
+  .pdp-vendor {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: {{ section.settings.text_muted_color | default: '#999999' }};
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .pdp-price-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .pdp-price {
+    font-size: {{ section.settings.price_size | default: 24 }}px;
+    font-weight: {{ section.settings.price_weight | default: 600 }};
+    color: {{ section.settings.price_color | default: '#1a1a2e' }};
+  }
+
+  .pdp-compare-price {
+    font-size: 16px;
+    color: {{ section.settings.compare_price_color | default: '#999999' }};
+    text-decoration: line-through;
+  }
+
+  .pdp-tax-note {
+    font-size: 12px;
+    color: {{ section.settings.text_muted_color | default: '#999999' }};
+  }
+
+  .pdp-price-per-unit {
+    font-size: 12px;
+    color: {{ section.settings.text_muted_color | default: '#999999' }};
+    margin-bottom: 20px;
+  }
+
+  .pdp-delivery {
+    font-size: {{ section.settings.delivery_size | default: 14 }}px;
+    font-weight: 500;
+    color: {{ section.settings.delivery_color | default: '#666666' }};
+    margin-bottom: 40px;
+  }
+
+  /* Color Selector */
+  .pdp-option {
+    margin-bottom: 30px;
+  }
+
+  .pdp-option-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ section.settings.label_color | default: '#333333' }};
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .pdp-color-swatches {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* Swatch — muestra de tela */
+  .pdp-color-swatch {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    position: relative;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    display: block;
+    flex-shrink: 0;
+    /* Sheen que simula brillo de tejido */
+    background-image: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.22) 0%, transparent 65%);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.18), inset 0 1px 2px rgba(255,255,255,0.15);
+  }
+
+  .pdp-color-swatch:hover {
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.22), inset 0 1px 2px rgba(255,255,255,0.2);
+  }
+
+  .pdp-color-swatch.active {
+    border-color: {{ section.settings.swatch_border_active | default: '#333333' }};
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.2);
+  }
+
+  /* Anillo exterior del swatch activo */
+  .pdp-color-swatch.active::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border: 1.5px solid {{ section.settings.swatch_border_active | default: '#333333' }};
+    border-radius: 50%;
+    opacity: 0.55;
+  }
+
+  /* Tooltip con nombre del color */
+  .pdp-color-swatch::before {
+    content: attr(data-color-name);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 10;
+  }
+
+  .pdp-color-swatch:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Quantity Selector */
+  .pdp-quantity-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+  }
+
+  .pdp-quantity {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .pdp-quantity-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid {{ section.settings.quantity_border | default: '#dddddd' }};
+    background-color: {{ section.settings.quantity_bg | default: '#ffffff' }};
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: {{ section.settings.quantity_color | default: '#333333' }};
+    transition: all 0.2s ease;
+  }
+
+  .pdp-quantity-btn:hover {
+    background-color: {{ section.settings.quantity_hover_bg | default: '#f5f5f5' }};
+  }
+
+  .pdp-quantity-input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: {{ section.settings.quantity_color | default: '#333333' }};
+    background: transparent;
+    -moz-appearance: textfield;
+  }
+
+  .pdp-quantity-input::-webkit-outer-spin-button,
+  .pdp-quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Buttons */
+  .pdp-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 35px;
+  }
+
+  .pdp-btn {
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: {{ section.settings.button_radius | default: 25 }}px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s ease;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .pdp-btn:hover {
+    opacity: 0.9;
+  }
+
+  .pdp-btn-buy {
+    background-color: {{ section.settings.buy_btn_bg | default: '#7B4A2F' }};
+    color: {{ section.settings.buy_btn_color | default: '#ffffff' }};
+  }
+
+  .pdp-btn-cart {
+    background-color: {{ section.settings.cart_btn_bg | default: '#e8e8e8' }};
+    color: {{ section.settings.cart_btn_color | default: '#333333' }};
+  }
+
+  .pdp-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Accordions */
+  .pdp-accordions {
+    border-top: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+    margin-bottom: 30px;
+  }
+
+  .pdp-accordion {
+    border-bottom: 1px solid {{ section.settings.border_color | default: '#e0e0e0' }};
+  }
+
+  .pdp-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 2px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: {{ section.settings.accordion_color | default: '#333333' }};
+    user-select: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .pdp-accordion-header:hover {
+    opacity: 0.65;
+  }
+
+  /* Toggle +/- via pseudo-elements */
+  .pdp-accordion-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid {{ section.settings.border_color | default: '#d0d0d0' }};
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color 0.2s ease;
+  }
+
+  .pdp-accordion-toggle::before,
+  .pdp-accordion-toggle::after {
+    content: '';
+    position: absolute;
+    background: {{ section.settings.accordion_color | default: '#333333' }};
+    border-radius: 2px;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  }
+
+  /* Horizontal bar — always visible */
+  .pdp-accordion-toggle::before {
+    width: 10px;
+    height: 1.5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Vertical bar — visible when closed (+), hidden when open (-) */
+  .pdp-accordion-toggle::after {
+    width: 1.5px;
+    height: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+
+  .pdp-accordion.open .pdp-accordion-toggle::after {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .pdp-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* max-height is set dynamically via JS to scrollHeight — never clips content */
+
+  .pdp-accordion-inner {
+    padding: 4px 0 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: {{ section.settings.accordion_content_color | default: '#666666' }};
+  }
+
+  /* Normaliza el HTML de la descripción del producto (h2, h3, ul, li, strong, p) */
+  .pdp-accordion-inner h1,
+  .pdp-accordion-inner h2,
+  .pdp-accordion-inner h3,
+  .pdp-accordion-inner h4,
+  .pdp-accordion-inner h5 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: {{ section.settings.accordion_color | default: '#333333' }};
+    margin: 12px 0 6px;
+  }
+
+  .pdp-accordion-inner p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 8px;
+  }
+
+  .pdp-accordion-inner ul,
+  .pdp-accordion-inner ol {
+    padding-left: 18px;
+    margin: 6px 0 10px;
+  }
+
+  .pdp-accordion-inner li {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 3px;
+  }
+
+  .pdp-accordion-inner strong,
+  .pdp-accordion-inner b {
+    font-weight: 600;
+    color: {{ section.settings.accordion_color | default: '#333333' }};
+  }
+
+  /* Care instructions — lista de texto */
+  .pdp-care-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pdp-care-list-item {
+    font-size: 13px;
+    line-height: 1.5;
+    color: {{ section.settings.accordion_content_color | default: '#555555' }};
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pdp-care-list-item::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: {{ section.settings.accordion_color | default: '#999999' }};
+    flex-shrink: 0;
+  }
+
+  /* Care icons grid */
+  .pdp-care-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pdp-care-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    width: 66px;
+    text-align: center;
+    background: #f6f5f3;
+    border-radius: 10px;
+    padding: 12px 6px 9px;
+  }
+
+  .pdp-care-item svg {
+    width: 28px;
+    height: 28px;
+    stroke: {{ section.settings.accordion_color | default: '#333333' }};
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+
+  .pdp-care-item span {
+    font-size: 9.5px;
+    line-height: 1.3;
+    color: {{ section.settings.accordion_content_color | default: '#666666' }};
+  }
+
+  /* Product Tags/Badges */
+  .pdp-badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+
+  .pdp-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .pdp-badge-sale {
+    background-color: {{ section.settings.sale_badge_bg | default: '#e74c3c' }};
+    color: {{ section.settings.sale_badge_color | default: '#ffffff' }};
+  }
+
+  .pdp-badge-new {
+    background-color: {{ section.settings.new_badge_bg | default: '#27ae60' }};
+    color: {{ section.settings.new_badge_color | default: '#ffffff' }};
+  }
+
+  /* Wishlist Button */
+  .pdp-wishlist-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: {{ section.settings.wishlist_bg | default: '#f5f5f5' }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .pdp-wishlist-btn:hover {
+    background-color: {{ section.settings.wishlist_hover_bg | default: '#e8e8e8' }};
+    transform: scale(1.05);
+  }
+
+  .pdp-wishlist-btn.active {
+    background-color: {{ section.settings.wishlist_active_bg | default: '#e74c3c' }};
+  }
+
+  .pdp-wishlist-btn svg {
+    width: 22px;
+    height: 22px;
+    stroke: {{ section.settings.wishlist_color | default: '#333333' }};
+    fill: none;
+    transition: all 0.2s ease;
+  }
+
+  .pdp-wishlist-btn.active svg {
+    stroke: #ffffff;
+    fill: #ffffff;
+  }
+
+  /* Mobile accordion improvements */
+  @media (max-width: 768px) {
+    .pdp-accordions {
+      margin-bottom: 24px;
+    }
+
+    .pdp-accordion-header {
+      padding: 18px 4px;
+      font-size: 14px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .pdp-accordion-toggle {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .pdp-accordion-inner {
+      padding: 2px 0 18px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .pdp-accordion-inner p,
+    .pdp-accordion-inner li {
+      font-size: 14px;
+    }
+  }
+
+  /* Bottom description */
+  .pdp-description {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.7;
+    color: {{ section.settings.description_color | default: '#666666' }};
+  }
+</style>
+
+<div class="pdp-section-{{ section.id }}">
+  <div class="pdp-container">
+
+    {% if product != blank %}
+      <div class="pdp-grid">
+
+        <!-- ── LEFT: Stacked Gallery ── -->
+        <div>
+          <div class="pdp-gallery" id="pdp-gallery-{{ section.id }}">
+            {%- for image in product.images -%}
+              <div class="pdp-gallery-image" onclick="openLightbox({{ forloop.index0 }})">
+                <img
+                  src="{{ image | image_url: width: 1200 }}"
+                  alt="{{ image.alt | escape }}"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                >
+              </div>
+            {%- else -%}
+              <div class="pdp-gallery-image">
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              </div>
+            {%- endfor -%}
+          </div>
+
+          <!-- Dots: mobile only -->
+          {%- if product.images.size > 1 -%}
+            <div class="pdp-gallery-dots" id="pdp-dots-{{ section.id }}">
+              {%- for image in product.images -%}
+                <button class="pdp-dot{% if forloop.first %} active{% endif %}" data-index="{{ forloop.index0 }}" aria-label="Imagen {{ forloop.index }}"></button>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        <!-- ── RIGHT: Sticky Info Card ── -->
+        <div class="pdp-info">
+
+          <!-- Badges & Wishlist -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+            <div class="pdp-badges">
+              {% if product.compare_at_price > product.price %}
+                <span class="pdp-badge pdp-badge-sale">{{ section.settings.sale_badge_text | default: 'Sale' }}</span>
+              {% endif %}
+              {% assign created_date = product.created_at | date: '%s' %}
+              {% assign now_date = 'now' | date: '%s' %}
+              {% assign diff_days = now_date | minus: created_date | divided_by: 86400 %}
+              {% if diff_days < 30 %}
+                <span class="pdp-badge pdp-badge-new">{{ section.settings.new_badge_text | default: 'Nuevo' }}</span>
+              {% endif %}
+            </div>
+
+            <button type="button" class="pdp-wishlist-btn"
+              data-product-id="{{ product.handle }}"
+              aria-label="Agregar a favoritos">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="1.5"/>
+              </svg>
+            </button>
+          </div>
+
+          {%- if product.vendor != blank -%}
+            <span class="pdp-vendor">{{ product.vendor }}</span>
+          {%- endif -%}
+
+          <h1 class="pdp-title">{{ product.title }}</h1>
+
+          <div class="pdp-price-wrapper">
+            <span class="pdp-price">{{ product.price | money }}</span>
+            {% if product.compare_at_price > product.price %}
+              <span class="pdp-compare-price">{{ product.compare_at_price | money }}</span>
+            {% endif %}
+          </div>
+          <p class="pdp-price-per-unit">{{ section.settings.tax_text | default: 'Precio incl. IVA · por metro' }}</p>
+
+          <!-- Delivery date — populated dynamically por JS -->
+          <p class="pdp-delivery" data-delivery-estimation>
+            {{ section.settings.delivery_text | default: 'Recibe entre' }} ...
+          </p>
+
+          <!-- Color Family swatches — detecta colección via primera palabra del título -->
+          {%- assign _title_first = product.title | split: ' ' | first | downcase -%}
+          {%- assign _color_handle = _title_first | append: '-colores' -%}
+          {%- assign color_family_col = collections[_color_handle] -%}
+
+          {%- if color_family_col != nil and color_family_col.products_count > 1 -%}
+            <div class="pdp-option">
+              <span class="pdp-option-label">{{ section.settings.color_family_label | default: 'Otros colores' }}</span>
+              <div class="pdp-color-swatches">
+                {%- for p in color_family_col.products -%}
+                  <a href="{{ p.url }}"
+                     class="pdp-color-swatch{% if p.id == product.id %} active{% endif %}"
+                     style="background-color: {{ p.metafields.custom.color_hex.value | default: '#cccccc' }};"
+                     aria-label="{{ p.title }}"
+                     data-color-name="{{ p.title }}">
+                  </a>
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- elsif request.design_mode -%}
+            <!-- DEMO: swatches de muestra visibles solo en el editor de temas -->
+            <div class="pdp-option">
+              <span class="pdp-option-label">{{ section.settings.color_family_label | default: 'Otros colores' }}</span>
+              <div class="pdp-color-swatches">
+                <a href="#" class="pdp-color-swatch active" style="background-color: #d4c4a8;" data-color-name="Beige Natural" aria-label="Beige Natural"></a>
+                <a href="#" class="pdp-color-swatch" style="background-color: #c0715a;" data-color-name="Terracota" aria-label="Terracota"></a>
+                <a href="#" class="pdp-color-swatch" style="background-color: #9ea6a8;" data-color-name="Gris Piedra" aria-label="Gris Piedra"></a>
+                <a href="#" class="pdp-color-swatch" style="background-color: #2d3b5a;" data-color-name="Azul Noche" aria-label="Azul Noche"></a>
+                <a href="#" class="pdp-color-swatch" style="background-color: #6b8c6e;" data-color-name="Verde Salvia" aria-label="Verde Salvia"></a>
+                <a href="#" class="pdp-color-swatch" style="background-color: #f2ede4;" data-color-name="Blanco Roto" aria-label="Blanco Roto"></a>
+              </div>
+            </div>
+          {%- endif -%}
+
+          <!-- Product Form -->
+          {%- form 'product', product, id: 'pdp-form', class: 'pdp-form' -%}
+
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+            <!-- Quantity — 0.5 step -->
+            <div class="pdp-quantity-wrapper">
+              <span class="pdp-option-label">{{ section.settings.quantity_label | default: 'Longitud en metros' }}</span>
+              <div class="pdp-quantity">
+                <button type="button" class="pdp-quantity-btn" data-action="decrease">−</button>
+                <input type="number" name="quantity" value="0.5" min="0.5" step="0.5" class="pdp-quantity-input" id="Quantity-{{ section.id }}">
+                <button type="button" class="pdp-quantity-btn" data-action="increase">+</button>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="pdp-buttons">
+              <button
+                type="submit"
+                name="checkout"
+                class="pdp-btn pdp-btn-buy"
+                {% unless product.available %}disabled{% endunless %}
+              >
+                {% if product.available %}
+                  {{ section.settings.buy_btn_text | default: 'Comprar ahora' }}
+                {% else %}
+                  {{ section.settings.sold_out_text | default: 'Agotado' }}
+                {% endif %}
+              </button>
+
+              <button
+                type="submit"
+                name="add"
+                class="pdp-btn pdp-btn-cart"
+                {% unless product.available %}disabled{% endunless %}
+              >
+                {% if product.available %}
+                  {{ section.settings.cart_btn_text | default: 'Agregar al carrito' }}
+                {% else %}
+                  {{ section.settings.sold_out_text | default: 'Agotado' }}
+                {% endif %}
+              </button>
+            </div>
+
+          {%- endform -%}
+
+          <!-- Accordions -->
+          <div class="pdp-accordions">
+
+            <!-- Acordeón 1: Descripción -->
+            <div class="pdp-accordion {% if section.settings.accordion1_open %}open{% endif %}">
+              <div class="pdp-accordion-header">
+                <span>{{ section.settings.accordion1_title | default: 'Descripción' }}</span>
+                <span class="pdp-accordion-toggle" aria-hidden="true"></span>
+              </div>
+              <div class="pdp-accordion-content">
+                <div class="pdp-accordion-inner">
+                  {{ product.description }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Acordeón 2: Instrucciones de cuidado (metafield shopify.care-instructions) -->
+            {%- assign care_key = 'care-instructions' -%}
+            {%- assign care_instructions = product.metafields.shopify[care_key].value -%}
+            {%- if care_instructions -%}
+              <div class="pdp-accordion {% if section.settings.accordion2_open %}open{% endif %}">
+                <div class="pdp-accordion-header">
+                  <span>{{ section.settings.accordion2_title | default: 'Instrucciones de cuidado' }}</span>
+                  <span class="pdp-accordion-toggle" aria-hidden="true"></span>
+                </div>
+                <div class="pdp-accordion-content">
+                  <div class="pdp-accordion-inner">
+                    <ul class="pdp-care-list">
+                      {%- for instruction in care_instructions -%}
+                        {%- assign care_label = instruction.label | default: instruction.name | default: instruction.title | default: instruction.handle | default: '' -%}
+                        {%- if care_label == blank -%}
+                          {%- assign care_label = instruction | json | remove: '"' -%}
+                        {%- endif -%}
+                        <li class="pdp-care-list-item">{{ care_label }}</li>
+                      {%- endfor -%}
+                    </ul>
+                    {% comment %}PLACEHOLDER — reemplazar con bloque de iconos cuando se resuelva acceso a metaobject{% endcomment %}
+                    <div class="pdp-care-items" style="display:none">
+                      {%- for instruction in care_instructions -%}
+                        {%- assign care_val = instruction.handle | default: instruction | downcase | replace: ' ', '-' -%}
+                        {%- assign care_label = instruction.label | default: instruction.name | default: instruction -%}
+
+                        {%- case care_val -%}
+
+                          {%- when 'machine-wash-cold', 'lavado-a-maquina-en-frio', 'lavado-a-maquina', 'machine-wash' -%}
+                            {%- assign care_label = 'Lavado a máquina' -%}
+                            <div class="pdp-care-item">
+                              <!-- Tub outline (trapezoid) + water waves -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 7h18l-2 13H5L3 7z"/>
+                                <path d="M7.5 14c.8-1.2 1.5-1.2 2.3 0 .8 1.2 1.5 1.2 2.3 0 .8-1.2 1.5-1.2 2.3 0"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'machine-wash-warm', 'lavado-a-maquina-en-caliente' -%}
+                            {%- assign care_label = 'Máquina caliente' -%}
+                            <div class="pdp-care-item">
+                              <!-- Tub + waves + 2 temp dots below -->
+                              <svg viewBox="0 0 24 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 7h18l-2 13H5L3 7z"/>
+                                <path d="M7.5 14c.8-1.2 1.5-1.2 2.3 0 .8 1.2 1.5 1.2 2.3 0 .8-1.2 1.5-1.2 2.3 0"/>
+                                <circle cx="9.5" cy="24" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="14.5" cy="24" r="1.2" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'machine-wash-hot' -%}
+                            {%- assign care_label = 'Máquina muy caliente' -%}
+                            <div class="pdp-care-item">
+                              <!-- Tub + waves + 3 temp dots below -->
+                              <svg viewBox="0 0 24 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 7h18l-2 13H5L3 7z"/>
+                                <path d="M7.5 14c.8-1.2 1.5-1.2 2.3 0 .8 1.2 1.5 1.2 2.3 0 .8-1.2 1.5-1.2 2.3 0"/>
+                                <circle cx="7" cy="24" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="12" cy="24" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="17" cy="24" r="1.2" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'hand-wash-only', 'hand-wash', 'lavado-a-mano' -%}
+                            {%- assign care_label = 'Lavar a mano' -%}
+                            <div class="pdp-care-item">
+                              <!-- Tub + hand silhouette -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 7h18l-2 13H5L3 7z"/>
+                                <path d="M10 19v-5a1 1 0 012 0v3m0-3v-1.5a1 1 0 012 0v1.5m0 0a1 1 0 012 0v3.5c0 1-.6 2-2 2"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'do-not-wash', 'no-lavar', 'no-wash' -%}
+                            {%- assign care_label = 'No lavar' -%}
+                            <div class="pdp-care-item">
+                              <!-- Tub + X -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 7h18l-2 13H5L3 7z"/>
+                                <line x1="7" y1="10" x2="17" y2="18"/>
+                                <line x1="17" y1="10" x2="7" y2="18"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'do-not-bleach', 'no-usar-lejia', 'no-bleach' -%}
+                            {%- assign care_label = 'No usar lejía' -%}
+                            <div class="pdp-care-item">
+                              <!-- Triangle (bleach symbol) + X -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3L22 20H2L12 3z"/>
+                                <line x1="8" y1="12" x2="16" y2="18"/>
+                                <line x1="16" y1="12" x2="8" y2="18"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'bleach-when-needed', 'non-chlorine-bleach' -%}
+                            {%- assign care_label = 'Lejía sin cloro' -%}
+                            <div class="pdp-care-item">
+                              <!-- Empty triangle = bleach OK -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3L22 20H2L12 3z"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'do-not-tumble-dry', 'no-usar-secadora' -%}
+                            {%- assign care_label = 'No usar secadora' -%}
+                            <div class="pdp-care-item">
+                              <!-- Square + inner circle + diagonal X -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2"/>
+                                <circle cx="12" cy="12" r="5.5"/>
+                                <line x1="5" y1="5" x2="19" y2="19"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'tumble-dry-low' -%}
+                            {%- assign care_label = 'Secadora baja' -%}
+                            <div class="pdp-care-item">
+                              <!-- Square + circle + 1 dot -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2"/>
+                                <circle cx="12" cy="12" r="5.5"/>
+                                <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'tumble-dry-normal', 'tumble-dry' -%}
+                            {%- assign care_label = 'Secadora normal' -%}
+                            <div class="pdp-care-item">
+                              <!-- Square + circle + 2 dots -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2"/>
+                                <circle cx="12" cy="12" r="5.5"/>
+                                <circle cx="10" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="14" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'line-dry', 'secar-al-aire' -%}
+                            {%- assign care_label = 'Secar al aire' -%}
+                            <div class="pdp-care-item">
+                              <!-- Square + vertical center line -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2"/>
+                                <line x1="12" y1="6" x2="12" y2="18"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'dry-flat', 'secar-en-plano' -%}
+                            {%- assign care_label = 'Secar en plano' -%}
+                            <div class="pdp-care-item">
+                              <!-- Square + horizontal center line -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="2" width="20" height="20" rx="2"/>
+                                <line x1="6" y1="12" x2="18" y2="12"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'do-not-wring', 'no-escurrir' -%}
+                            {%- assign care_label = 'No escurrir' -%}
+                            <div class="pdp-care-item">
+                              <!-- Two twist waves + diagonal X -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 9c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0"/>
+                                <path d="M4 15c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'iron-low', 'plancha-fria', 'plancha-baja' -%}
+                            {%- assign care_label = 'Plancha fría' -%}
+                            <div class="pdp-care-item">
+                              <!-- Iron silhouette + 1 dot -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 15h14l-2-7H7L5 15z"/>
+                                <line x1="5" y1="18" x2="19" y2="18"/>
+                                <circle cx="12" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'iron-medium', 'plancha-media' -%}
+                            {%- assign care_label = 'Plancha media' -%}
+                            <div class="pdp-care-item">
+                              <!-- Iron silhouette + 2 dots -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 15h14l-2-7H7L5 15z"/>
+                                <line x1="5" y1="18" x2="19" y2="18"/>
+                                <circle cx="9.5" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="14.5" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'iron-high', 'plancha-alta' -%}
+                            {%- assign care_label = 'Plancha alta' -%}
+                            <div class="pdp-care-item">
+                              <!-- Iron silhouette + 3 dots -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 15h14l-2-7H7L5 15z"/>
+                                <line x1="5" y1="18" x2="19" y2="18"/>
+                                <circle cx="7.5" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="12" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+                                <circle cx="16.5" cy="21" r="1.2" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'do-not-iron', 'no-planchar' -%}
+                            {%- assign care_label = 'No planchar' -%}
+                            <div class="pdp-care-item">
+                              <!-- Iron silhouette + X -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 15h14l-2-7H7L5 15z"/>
+                                <line x1="5" y1="18" x2="19" y2="18"/>
+                                <line x1="8" y1="9" x2="16" y2="15"/>
+                                <line x1="16" y1="9" x2="8" y2="15"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'dry-clean-only', 'solo-limpieza-en-seco', 'dry-clean' -%}
+                            {%- assign care_label = 'Limpieza en seco' -%}
+                            <div class="pdp-care-item">
+                              <!-- Circle with P letter = standard dry-clean -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <text x="12" y="16.5" text-anchor="middle" font-size="9" stroke="none" fill="currentColor" font-family="sans-serif" font-weight="600">P</text>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- when 'do-not-dry-clean', 'no-limpieza-en-seco' -%}
+                            {%- assign care_label = 'No limpiar en seco' -%}
+                            <div class="pdp-care-item">
+                              <!-- Circle + X -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <line x1="5.5" y1="5.5" x2="18.5" y2="18.5"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                          {%- else -%}
+                            <div class="pdp-care-item">
+                              <!-- Generic info icon -->
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <circle cx="12" cy="16" r="1" fill="currentColor" stroke="none"/>
+                              </svg>
+                              <span>{{ care_label }}</span>
+                            </div>
+
+                        {%- endcase -%}
+                      {%- endfor -%}
+                    </div><!-- /pdp-care-items -->
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+
+            <!-- Acordeón 3: Envío (opcional) -->
+            {% if section.settings.show_accordion3 %}
+              <div class="pdp-accordion {% if section.settings.accordion3_open %}open{% endif %}">
+                <div class="pdp-accordion-header">
+                  <span>{{ section.settings.accordion3_title | default: 'Envío y devoluciones' }}</span>
+                  <span class="pdp-accordion-toggle" aria-hidden="true"></span>
+                </div>
+                <div class="pdp-accordion-content">
+                  <div class="pdp-accordion-inner">
+                    {{ section.settings.accordion3_content | default: 'Envío estándar en 3-5 días hábiles. Devoluciones gratuitas dentro de los 30 días.' }}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+
+          </div>
+
+          {% if section.settings.show_bottom_description %}
+            <div class="pdp-description">
+              {{ section.settings.bottom_description }}
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    {% else %}
+      <div style="text-align: center; padding: 60px 20px;">
+        <p style="font-size: 16px; color: #666;">
+          {{ section.settings.no_product_text | default: 'No se encontró el producto. Esta sección solo funciona en páginas de producto.' }}
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // ── Quantity counter: 0.5 increments ──
+    const quantityInput = document.getElementById('Quantity-{{ section.id }}');
+    const decreaseBtn = document.querySelector('.pdp-section-{{ section.id }} [data-action="decrease"]');
+    const increaseBtn = document.querySelector('.pdp-section-{{ section.id }} [data-action="increase"]');
+
+    if (decreaseBtn && increaseBtn && quantityInput) {
+      decreaseBtn.addEventListener('click', function() {
+        let value = parseFloat(quantityInput.value) || 0.5;
+        if (value > 0.5) {
+          quantityInput.value = Math.round((value - 0.5) * 10) / 10;
+        }
+      });
+      increaseBtn.addEventListener('click', function() {
+        let value = parseFloat(quantityInput.value) || 0.5;
+        quantityInput.value = Math.round((value + 0.5) * 10) / 10;
+      });
+    }
+
+    // ── Dynamic delivery date (skips Sundays) ──
+    const deliveryEl = document.querySelector('.pdp-section-{{ section.id }} [data-delivery-estimation]');
+    if (deliveryEl) {
+      const minDays = {{ section.settings.delivery_days_min | default: 3 }};
+      const maxDays = {{ section.settings.delivery_days_max | default: 7 }};
+      const deliveryLabel = {{ section.settings.delivery_text | default: 'Recibe entre' | json }};
+
+      function getDeliveryDate(daysToAdd) {
+        const date = new Date();
+        let added = 0;
+        while (added < daysToAdd) {
+          date.setDate(date.getDate() + 1);
+          if (date.getDay() !== 0) added++; // skip Sundays
+        }
+        return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      }
+
+      deliveryEl.textContent = deliveryLabel + ' ' + getDeliveryDate(minDays) + ' - ' + getDeliveryDate(maxDays);
+    }
+
+    // ── Accordions ──
+    const accordions = document.querySelectorAll('.pdp-section-{{ section.id }} .pdp-accordion');
+
+    function setAccordionHeight(accordion, open) {
+      const content = accordion.querySelector('.pdp-accordion-content');
+      if (!content) return;
+      if (open) {
+        // Temporarily expose full height to measure, then animate
+        content.style.maxHeight = content.scrollHeight + 'px';
+      } else {
+        content.style.maxHeight = '0';
+      }
+    }
+
+    // Initialize heights for accordions already marked open in HTML
+    accordions.forEach(function(accordion) {
+      if (accordion.classList.contains('open')) {
+        setAccordionHeight(accordion, true);
+      }
+    });
+
+    accordions.forEach(function(accordion) {
+      const header = accordion.querySelector('.pdp-accordion-header');
+      header.addEventListener('click', function() {
+        const isOpen = accordion.classList.contains('open');
+        // Close all
+        accordions.forEach(function(acc) {
+          acc.classList.remove('open');
+          setAccordionHeight(acc, false);
+        });
+        // Open clicked one if it was closed
+        if (!isOpen) {
+          accordion.classList.add('open');
+          setAccordionHeight(accordion, true);
+        }
+      });
+    });
+
+    // ── Mobile gallery slider dots ──
+    const gallery = document.getElementById('pdp-gallery-{{ section.id }}');
+    const dotsContainer = document.getElementById('pdp-dots-{{ section.id }}');
+    if (gallery && dotsContainer) {
+      const dots = dotsContainer.querySelectorAll('.pdp-dot');
+      gallery.addEventListener('scroll', function() {
+        const index = Math.round(gallery.scrollLeft / gallery.offsetWidth);
+        dots.forEach(function(d, i) { d.classList.toggle('active', i === index); });
+      });
+      dots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          const i = parseInt(this.dataset.index);
+          gallery.scrollTo({ left: i * gallery.offsetWidth, behavior: 'smooth' });
+        });
+      });
+    }
+
+    // ── AJAX Add to Cart ──
+    const form = document.getElementById('pdp-form');
+    const cartBtn = form ? form.querySelector('button[name="add"]') : null;
+    const originalBtnText = cartBtn ? cartBtn.textContent.trim() : '';
+
+    if (form) {
+      form.addEventListener('submit', async function(e) {
+        const submitter = e.submitter;
+        if (submitter && submitter.name === 'checkout') return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (cartBtn) {
+          cartBtn.disabled = true;
+          cartBtn.textContent = 'Agregando...';
+        }
+
+        const variantId = form.querySelector('input[name="id"], select[name="id"]')?.value;
+        const quantity = form.querySelector('input[name="quantity"]')?.value || 0.5;
+
+        const formData = new FormData();
+        if (variantId) formData.append('id', variantId);
+        formData.append('quantity', quantity);
+        formData.append('form_type', 'product');
+        formData.append('utf8', '✓');
+
+        try {
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            await updateCartCounter();
+
+            if (cartBtn) {
+              cartBtn.textContent = '¡Agregado!';
+              cartBtn.style.backgroundColor = '#27ae60';
+              setTimeout(function() {
+                cartBtn.textContent = originalBtnText;
+                cartBtn.style.backgroundColor = '';
+                cartBtn.disabled = false;
+              }, 2000);
+            }
+          } else {
+            throw new Error(data.description || 'Error al agregar');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          if (cartBtn) {
+            cartBtn.textContent = 'Error';
+            setTimeout(function() {
+              cartBtn.textContent = originalBtnText;
+              cartBtn.disabled = false;
+            }, 2000);
+          }
+          alert(error.message || 'No se pudo agregar el producto');
+        }
+      });
+    }
+
+    async function updateCartCounter() {
+      try {
+        const response = await fetch('/cart.js?v=' + Date.now(), {
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!response.ok) throw new Error('Error al obtener carrito');
+        const cart = await response.json();
+        const itemCount = cart.item_count;
+
+        const selectors = [
+          '.cart-count', '.cart-count-bubble', '[data-cart-count]',
+          '.header__cart-count', '.cart-bubble', '.cart-item-count',
+          '#cart-count', 'a[href*="/cart"] .count', 'a[href*="/cart"] [class*="count"]'
+        ];
+
+        selectors.forEach(function(selector) {
+          document.querySelectorAll(selector).forEach(function(el) {
+            el.textContent = itemCount;
+            if (itemCount > 0) {
+              el.style.display = '';
+              el.style.visibility = 'visible';
+              el.style.opacity = '1';
+              el.classList.remove('hidden', 'hide');
+            } else {
+              el.style.display = 'none';
+            }
+            el.style.transition = 'transform 0.2s ease';
+            el.style.transform = 'scale(1.4)';
+            setTimeout(function() { el.style.transform = 'scale(1)'; }, 200);
+          });
+        });
+
+        window.dispatchEvent(new CustomEvent('cart:updated', {
+          detail: { itemCount: itemCount, cart: cart }
+        }));
+      } catch (error) {
+        console.error('Error al actualizar carrito:', error);
+      }
+    }
+
+    // ── Wishlist ──
+    (function cleanupOldWishlistData() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        const validItems = wishlist.filter(function(item) { return typeof item === 'string' && !/^\d+$/.test(item); });
+        if (validItems.length !== wishlist.length) localStorage.setItem('wishlist', JSON.stringify(validItems));
+      } catch (e) {}
+    })();
+
+    function getWishlist() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        return wishlist.filter(function(item) { return typeof item === 'string' && !/^\d+$/.test(item); });
+      } catch (e) { return []; }
+    }
+
+    function saveWishlist(wishlist) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      window.dispatchEvent(new CustomEvent('wishlist:updated', {
+        detail: { count: wishlist.length, wishlist: wishlist }
+      }));
+    }
+
+    const wishlistBtn = document.querySelector('.pdp-section-{{ section.id }} .pdp-wishlist-btn');
+    if (wishlistBtn) {
+      const productHandle = wishlistBtn.dataset.productId;
+      const savedWishlist = getWishlist();
+      if (savedWishlist.includes(productHandle)) wishlistBtn.classList.add('active');
+
+      wishlistBtn.addEventListener('click', function() {
+        const wishlist = getWishlist();
+        if (this.classList.contains('active')) {
+          this.classList.remove('active');
+          saveWishlist(wishlist.filter(function(id) { return id !== productHandle; }));
+        } else {
+          this.classList.add('active');
+          if (!wishlist.includes(productHandle)) wishlist.push(productHandle);
+          saveWishlist(wishlist);
+        }
+      });
+    }
+
+    window.addEventListener('wishlist:updated', function() {
+      if (wishlistBtn) {
+        const productHandle = wishlistBtn.dataset.productId;
+        const currentWishlist = getWishlist();
+        if (currentWishlist.includes(productHandle)) {
+          wishlistBtn.classList.add('active');
+        } else {
+          wishlistBtn.classList.remove('active');
+        }
+      }
+    });
+
+    // ── Lightbox ──
+    window.openLightbox = function(index) {
+      const images = document.querySelectorAll('.pdp-section-{{ section.id }} .pdp-gallery-image img');
+      if (images[index]) {
+        const lightbox = document.createElement('div');
+        lightbox.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer;';
+        lightbox.innerHTML = '<img src="' + images[index].src + '" style="max-width: 90%; max-height: 90%; object-fit: contain;">';
+        lightbox.onclick = function() { lightbox.remove(); };
+        document.body.appendChild(lightbox);
+      }
+    };
+
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PDP - Product Detail",
+  "tag": "section",
+  "class": "section-pdp",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "⚠️ Esta sección es DINÁMICA. Muestra automáticamente el producto que el usuario está viendo. Funciona en páginas de producto (product.json)."
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colores Generales"
+    },
+    { "type": "color", "id": "bg_color", "label": "Color de fondo", "default": "#ffffff" },
+    { "type": "color", "id": "title_color", "label": "Color del título", "default": "#1a1a2e" },
+    { "type": "color", "id": "price_color", "label": "Color del precio", "default": "#1a1a2e" },
+    { "type": "color", "id": "compare_price_color", "label": "Color precio tachado", "default": "#999999" },
+    { "type": "color", "id": "text_muted_color", "label": "Color texto secundario", "default": "#999999" },
+    { "type": "color", "id": "delivery_color", "label": "Color texto entrega", "default": "#666666" },
+    { "type": "color", "id": "label_color", "label": "Color de etiquetas", "default": "#333333" },
+    { "type": "color", "id": "border_color", "label": "Color de bordes", "default": "#e0e0e0" },
+    { "type": "color", "id": "description_color", "label": "Color de descripción", "default": "#666666" },
+    {
+      "type": "header",
+      "content": "🏷️ Badges"
+    },
+    { "type": "color", "id": "sale_badge_bg", "label": "Fondo badge Sale", "default": "#e74c3c" },
+    { "type": "color", "id": "sale_badge_color", "label": "Texto badge Sale", "default": "#ffffff" },
+    { "type": "text", "id": "sale_badge_text", "label": "Texto badge Sale", "default": "Sale" },
+    { "type": "color", "id": "new_badge_bg", "label": "Fondo badge Nuevo", "default": "#27ae60" },
+    { "type": "color", "id": "new_badge_color", "label": "Texto badge Nuevo", "default": "#ffffff" },
+    { "type": "text", "id": "new_badge_text", "label": "Texto badge Nuevo", "default": "Nuevo" },
+    {
+      "type": "header",
+      "content": "❤️ Wishlist"
+    },
+    { "type": "color", "id": "wishlist_bg", "label": "Fondo del botón", "default": "#f5f5f5" },
+    { "type": "color", "id": "wishlist_hover_bg", "label": "Fondo hover", "default": "#e8e8e8" },
+    { "type": "color", "id": "wishlist_active_bg", "label": "Fondo activo", "default": "#e74c3c" },
+    { "type": "color", "id": "wishlist_color", "label": "Color del corazón", "default": "#333333" },
+    {
+      "type": "header",
+      "content": "🎨 Swatches de color"
+    },
+    { "type": "color", "id": "swatch_border_active", "label": "Borde swatch activo", "default": "#333333" },
+    { "type": "text", "id": "color_family_label", "label": "Etiqueta: selector de colores familia", "default": "Otros colores" },
+    {
+      "type": "header",
+      "content": "🎨 Botones"
+    },
+    { "type": "color", "id": "buy_btn_bg", "label": "Fondo botón Comprar", "default": "#7B4A2F" },
+    { "type": "color", "id": "buy_btn_color", "label": "Texto botón Comprar", "default": "#ffffff" },
+    { "type": "color", "id": "cart_btn_bg", "label": "Fondo botón Carrito", "default": "#e8e8e8" },
+    { "type": "color", "id": "cart_btn_color", "label": "Texto botón Carrito", "default": "#333333" },
+    { "type": "color", "id": "quantity_bg", "label": "Fondo botones cantidad", "default": "#ffffff" },
+    { "type": "color", "id": "quantity_border", "label": "Borde botones cantidad", "default": "#dddddd" },
+    { "type": "color", "id": "quantity_color", "label": "Color botones cantidad", "default": "#333333" },
+    {
+      "type": "header",
+      "content": "🎨 Acordeones"
+    },
+    { "type": "color", "id": "accordion_color", "label": "Color títulos acordeón", "default": "#333333" },
+    { "type": "color", "id": "accordion_content_color", "label": "Color contenido acordeón", "default": "#666666" },
+    {
+      "type": "header",
+      "content": "🎨 Galería"
+    },
+    { "type": "color", "id": "image_bg", "label": "Fondo de imágenes", "default": "#f5f5f5" },
+    {
+      "type": "header",
+      "content": "📝 Textos"
+    },
+    { "type": "text", "id": "tax_text", "label": "Texto de impuestos", "default": "Precio incl. IVA" },
+    { "type": "text", "id": "delivery_text", "label": "Prefijo fecha entrega", "default": "Recibe entre" },
+    { "type": "range", "id": "delivery_days_min", "label": "Días mínimos de entrega", "min": 1, "max": 14, "step": 1, "default": 3 },
+    { "type": "range", "id": "delivery_days_max", "label": "Días máximos de entrega", "min": 2, "max": 21, "step": 1, "default": 7 },
+    { "type": "text", "id": "quantity_label", "label": "Label de cantidad", "default": "Longitud en metros" },
+    { "type": "text", "id": "buy_btn_text", "label": "Texto botón Comprar", "default": "Comprar ahora" },
+    { "type": "text", "id": "cart_btn_text", "label": "Texto botón Carrito", "default": "Agregar al carrito" },
+    { "type": "text", "id": "sold_out_text", "label": "Texto Agotado", "default": "Agotado" },
+    {
+      "type": "header",
+      "content": "📋 Acordeones"
+    },
+    { "type": "text", "id": "accordion1_title", "label": "Título acordeón 1 (Descripción)", "default": "Descripción" },
+    { "type": "checkbox", "id": "accordion1_open", "label": "Acordeón Descripción abierto por defecto", "default": true },
+    { "type": "text", "id": "accordion2_title", "label": "Título acordeón 2 (Cuidado)", "default": "Instrucciones de cuidado" },
+    { "type": "checkbox", "id": "accordion2_open", "label": "Acordeón Cuidado abierto por defecto", "default": false },
+    { "type": "checkbox", "id": "show_accordion3", "label": "Mostrar acordeón Envíos", "default": false },
+    { "type": "text", "id": "accordion3_title", "label": "Título acordeón 3 (Envío)", "default": "Envío y devoluciones" },
+    { "type": "textarea", "id": "accordion3_content", "label": "Contenido acordeón 3", "default": "Envío estándar en 3-5 días hábiles. Devoluciones gratuitas dentro de los 30 días." },
+    { "type": "checkbox", "id": "accordion3_open", "label": "Acordeón Envíos abierto", "default": false },
+    { "type": "checkbox", "id": "show_bottom_description", "label": "Mostrar descripción inferior", "default": false },
+    { "type": "textarea", "id": "bottom_description", "label": "Descripción inferior", "default": "Información adicional del producto." },
+    {
+      "type": "header",
+      "content": "⚙️ Configuración"
+    },
+    { "type": "text", "id": "no_product_text", "label": "Texto cuando no hay producto", "default": "No se encontró el producto. Esta sección solo funciona en páginas de producto." },
+    {
+      "type": "header",
+      "content": "📐 Layout"
+    },
+    { "type": "range", "id": "title_size", "label": "Tamaño del título", "min": 20, "max": 48, "step": 2, "unit": "px", "default": 32 },
+    { "type": "range", "id": "price_size", "label": "Tamaño del precio", "min": 16, "max": 32, "step": 2, "unit": "px", "default": 24 },
+    { "type": "range", "id": "image_radius", "label": "Redondeo de imágenes", "min": 0, "max": 20, "step": 1, "unit": "px", "default": 8 },
+    { "type": "range", "id": "button_radius", "label": "Redondeo de botones", "min": 0, "max": 30, "step": 1, "unit": "px", "default": 25 }
+  ],
+  "presets": [
+    {
+      "name": "PDP - Product Detail",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,831 @@
+{% comment %}
+  PLP - Product Listing Page Section
+  DINÁMICO: Detecta automáticamente la colección actual
+{% endcomment %}
+
+{{ 'component-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+
+<style>
+  .plp-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#ffffff' }};
+    padding: 40px 20px 80px;
+  }
+
+  .plp-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .plp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    gap: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .plp-header {
+      flex-direction: column;
+      gap: 20px;
+    }
+  }
+
+  .plp-title {
+    font-size: {{ section.settings.title_size | default: 28 }}px;
+    font-weight: {{ section.settings.title_weight | default: 600 }};
+    color: {{ section.settings.title_color | default: '#000000' }};
+    margin: 0 0 10px;
+  }
+
+  .plp-description {
+    font-size: {{ section.settings.desc_size | default: 14 }}px;
+    font-weight: 500;
+    color: {{ section.settings.desc_color | default: '#666666' }};
+    margin: 0;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+
+  /* Filters Bar */
+  .plp-filters-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .plp-filters-left {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .plp-filter-btn {
+    padding: 10px 18px;
+    border: 1px solid {{ section.settings.filter_border | default: '#e0e0e0' }};
+    border-radius: {{ section.settings.filter_radius | default: 20 }}px;
+    background-color: {{ section.settings.filter_bg | default: '#ffffff' }};
+    color: {{ section.settings.filter_color | default: '#333333' }};
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .plp-filter-btn:hover,
+  .plp-filter-btn.active {
+    background-color: {{ section.settings.filter_active_bg | default: '#f5f5f5' }};
+    border-color: {{ section.settings.filter_active_border | default: '#cccccc' }};
+  }
+
+  .plp-filter-btn svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .plp-filters-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 13px;
+    color: {{ section.settings.text_color | default: '#666666' }};
+  }
+
+  .plp-product-count {
+    font-weight: 500;
+  }
+
+  .plp-reset-btn {
+    background: none;
+    border: none;
+    color: {{ section.settings.reset_color | default: '#999999' }};
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .plp-reset-btn:hover {
+    color: {{ section.settings.reset_hover_color | default: '#333333' }};
+  }
+
+  /* Filter Dropdown (dinámico) */
+  .plp-filter-group {
+    position: relative;
+  }
+
+  .plp-filter-group summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .plp-filter-group summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .plp-filter-active-count {
+    font-weight: 600;
+    color: {{ section.settings.filter_active_border | default: '#333333' }};
+    margin-left: 2px;
+  }
+
+  .plp-filter-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid {{ section.settings.filter_border | default: '#e0e0e0' }};
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 8px 0;
+    z-index: 100;
+  }
+
+  .plp-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: {{ section.settings.filter_color | default: '#333333' }};
+    transition: background 0.15s;
+  }
+
+  .plp-filter-option:hover {
+    background-color: {{ section.settings.filter_active_bg | default: '#f5f5f5' }};
+  }
+
+  .plp-filter-option input[type="checkbox"] {
+    accent-color: {{ section.settings.filter_active_border | default: '#333333' }};
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .plp-filter-option-count {
+    margin-left: auto;
+    color: #999;
+    font-size: 12px;
+  }
+
+  .plp-filters-form {
+    margin-bottom: 0;
+  }
+
+  /* Product Grid */
+  .plp-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
+    gap: {{ section.settings.grid_gap | default: 20 }}px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 1024px) {
+    .plp-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .plp-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Product Card */
+  .plp-card {
+    position: relative;
+  }
+
+  .plp-card-image-wrapper {
+    position: relative;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    border-radius: {{ section.settings.card_radius | default: 8 }}px;
+    background-color: {{ section.settings.card_bg | default: '#f5f5f5' }};
+  }
+
+  .plp-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .plp-card:hover .plp-card-image {
+    transform: scale(1.05);
+  }
+
+  .plp-card-wishlist {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: {{ section.settings.wishlist_bg | default: '#ffffff' }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    z-index: 2;
+  }
+
+  .plp-card-wishlist:hover {
+    background-color: {{ section.settings.wishlist_hover_bg | default: '#f5f5f5' }};
+    transform: scale(1.1);
+  }
+
+  .plp-card-wishlist svg {
+    width: 18px;
+    height: 18px;
+    stroke: {{ section.settings.wishlist_color | default: '#333333' }};
+    fill: none;
+    transition: all 0.2s ease;
+  }
+
+  .plp-card-wishlist.active svg {
+    fill: {{ section.settings.wishlist_active_color | default: '#e74c3c' }};
+    stroke: {{ section.settings.wishlist_active_color | default: '#e74c3c' }};
+  }
+
+  .plp-card-info {
+    padding: 12px 4px;
+  }
+
+  .plp-card-title {
+    font-size: {{ section.settings.card_title_size | default: 14 }}px;
+    font-weight: {{ section.settings.card_title_weight | default: 500 }};
+    color: {{ section.settings.card_title_color | default: '#333333' }};
+    margin: 0 0 6px;
+    line-height: 1.4;
+  }
+
+  .plp-card-price {
+    font-size: {{ section.settings.price_size | default: 13 }}px;
+    color: {{ section.settings.price_color | default: '#666666' }};
+    margin: 0;
+  }
+
+  .plp-card-price .compare-price {
+    text-decoration: line-through;
+    color: {{ section.settings.compare_price_color | default: '#999999' }};
+    margin-left: 8px;
+  }
+
+  .plp-card-price .sale-price {
+    color: {{ section.settings.sale_price_color | default: '#e74c3c' }};
+  }
+
+  /* Load More Button */
+  .plp-load-more {
+    text-align: center;
+  }
+
+  .plp-load-more-btn {
+    padding: 14px 40px;
+    background-color: {{ section.settings.load_more_bg | default: '#8B5A2B' }};
+    color: {{ section.settings.load_more_color | default: '#ffffff' }};
+    border: none;
+    border-radius: {{ section.settings.load_more_radius | default: 25 }}px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .plp-load-more-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* Empty State */
+  .plp-empty {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .plp-empty p {
+    font-size: 16px;
+    color: {{ section.settings.text_color | default: '#666666' }};
+  }
+</style>
+
+<div class="plp-section-{{ section.id }}">
+  <div class="plp-container">
+    
+    {% comment %}
+      ========================================
+      COLECCIÓN DINÁMICA - Usa la colección actual de la URL
+      ========================================
+    {% endcomment %}
+    
+    {% if collection != blank %}
+      
+      <!-- Header -->
+      <div class="plp-header">
+        <div class="plp-header-left">
+          <h1 class="plp-title">{{ collection.title }}</h1>
+          {% if section.settings.show_description and collection.description != blank %}
+            <p class="plp-description">{{ collection.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Filters Bar — dinámico via collection.filters (Search & Discovery app) -->
+      {% if section.settings.show_filters %}
+        <form method="get" action="{{ collection.url }}" class="plp-filters-form">
+          {%- if collection.sort_by != blank -%}
+            <input type="hidden" name="sort_by" value="{{ collection.sort_by }}">
+          {%- endif -%}
+          <div class="plp-filters-bar">
+            <div class="plp-filters-left">
+              {%- for filter in collection.filters -%}
+                <details class="plp-filter-group">
+                  <summary class="plp-filter-btn">
+                    {{- filter.label -}}
+                    {%- if filter.active_values.size > 0 -%}
+                      <span class="plp-filter-active-count">({{ filter.active_values.size }})</span>
+                    {%- endif -%}
+                    <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </summary>
+                  <div class="plp-filter-dropdown">
+                    {%- for filter_value in filter.values -%}
+                      <label class="plp-filter-option">
+                        <input
+                          type="checkbox"
+                          name="{{ filter_value.param_name }}"
+                          value="{{ filter_value.value }}"
+                          {% if filter_value.active %}checked{% endif %}
+                          onchange="this.closest('form').submit()">
+                        <span>{{ filter_value.label }}</span>
+                        <span class="plp-filter-option-count">({{ filter_value.count }})</span>
+                      </label>
+                    {%- endfor -%}
+                  </div>
+                </details>
+              {%- else -%}
+                {% comment %} Sin filtros configurados: instalar Search & Discovery app y definir filtros en admin {% endcomment %}
+              {%- endfor -%}
+            </div>
+            <div class="plp-filters-right">
+              <span class="plp-product-count">{{ collection.products_count }} {{ section.settings.products_label | default: 'productos' }}</span>
+              <a href="{{ collection.url }}" class="plp-reset-btn">{{ section.settings.reset_text | default: 'Borrar filtros' }}</a>
+            </div>
+          </div>
+        </form>
+      {% endif %}
+
+      <!-- Product Grid -->
+      <div class="plp-grid">
+        {% paginate collection.products by section.settings.products_per_page | default: 12 %}
+          {% for product in collection.products %}
+            <div class="plp-card">
+              <a href="{{ product.url }}" class="plp-card-link">
+                <div class="plp-card-image-wrapper">
+                  {% if product.featured_image != blank %}
+                    <img 
+                      src="{{ product.featured_image | image_url: width: 600 }}" 
+                      alt="{{ product.featured_image.alt | escape }}"
+                      class="plp-card-image"
+                      loading="lazy"
+                      width="400"
+                      height="533"
+                    >
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'plp-card-image' }}
+                  {% endif %}
+                </div>
+              </a>
+              
+              <button class="plp-card-wishlist" data-product-id="{{ product.handle }}" aria-label="Add to wishlist">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="1.5"/>
+                </svg>
+              </button>
+
+              <div class="plp-card-info">
+                <h3 class="plp-card-title">{{ product.title }}</h3>
+                <p class="plp-card-price">
+                  {% if product.compare_at_price > product.price %}
+                    <span class="sale-price">{{ product.price | money }}</span>
+                    <span class="compare-price">{{ product.compare_at_price | money }}</span>
+                  {% else %}
+                    {{ product.price | money }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          {% endfor %}
+
+          {% if paginate.pages > 1 %}
+            <div class="plp-pagination" style="grid-column: 1 / -1; text-align: center; margin-top: 40px;">
+              {{ paginate | default_pagination }}
+            </div>
+          {% endif %}
+        {% endpaginate %}
+      </div>
+
+      {% if collection.products_count == 0 %}
+        <div class="plp-empty">
+          <p>{{ section.settings.empty_text | default: 'No products found in this collection.' }}</p>
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div class="plp-empty">
+        <p>Esta sección solo funciona en páginas de colección.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // ============================================
+    // WISHLIST FUNCTIONALITY - PLP
+    // ============================================
+    
+    // Limpiar datos antiguos del localStorage
+    (function cleanupOldWishlistData() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        const validItems = wishlist.filter(item => typeof item === 'string' && !/^\d+$/.test(item));
+        if (validItems.length !== wishlist.length) {
+          localStorage.setItem('wishlist', JSON.stringify(validItems));
+        }
+      } catch (e) {}
+    })();
+
+    // Función para obtener wishlist
+    function getWishlist() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        // Filtrar solo handles válidos (strings, no IDs numéricos antiguos)
+        return wishlist.filter(item => typeof item === 'string' && !/^\d+$/.test(item));
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    // Función para guardar wishlist y disparar evento
+    function saveWishlist(wishlist) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      // Disparar evento para sincronizar con header y otras páginas
+      window.dispatchEvent(new CustomEvent('wishlist:updated', { 
+        detail: { count: wishlist.length, wishlist: wishlist }
+      }));
+    }
+    
+    // Inicializar botones de wishlist
+    const wishlistButtons = document.querySelectorAll('.plp-card-wishlist');
+    
+    wishlistButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const productId = this.dataset.productId;
+        let wishlist = getWishlist();
+        
+        if (this.classList.contains('active')) {
+          // Remover de favoritos
+          this.classList.remove('active');
+          wishlist = wishlist.filter(id => id !== productId);
+        } else {
+          // Agregar a favoritos
+          this.classList.add('active');
+          if (!wishlist.includes(productId)) {
+            wishlist.push(productId);
+          }
+        }
+        
+        saveWishlist(wishlist);
+      });
+    });
+    
+    // Check saved wishlist on load
+    const savedWishlist = getWishlist();
+    wishlistButtons.forEach(button => {
+      if (savedWishlist.includes(button.dataset.productId)) {
+        button.classList.add('active');
+      }
+    });
+    
+    // Escuchar cambios del wishlist desde otras páginas (para sincronizar en tiempo real)
+    window.addEventListener('wishlist:updated', function() {
+      const currentWishlist = getWishlist();
+      wishlistButtons.forEach(button => {
+        const productId = button.dataset.productId;
+        if (currentWishlist.includes(productId)) {
+          button.classList.add('active');
+        } else {
+          button.classList.remove('active');
+        }
+      });
+    });
+    
+    // Escuchar evento storage (si se actualiza en otra pestaña)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'wishlist') {
+        const currentWishlist = getWishlist();
+        wishlistButtons.forEach(button => {
+          const productId = button.dataset.productId;
+          if (currentWishlist.includes(productId)) {
+            button.classList.add('active');
+          } else {
+            button.classList.remove('active');
+          }
+        });
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "PLP - Collection",
+  "tag": "section",
+  "class": "section-plp",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "⚠️ Esta sección es DINÁMICA. Muestra automáticamente los productos de la colección actual. Funciona en páginas de colección (/collections/nombre-coleccion)."
+    },
+    {
+      "type": "header",
+      "content": "📝 Contenido"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Mostrar descripción de la colección",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "🔧 Filtros"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Mostrar barra de filtros",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "filter_all_text",
+      "label": "Texto filtro 'Todos'",
+      "default": "All"
+    },
+    {
+      "type": "text",
+      "id": "filter_2_text",
+      "label": "Filtro 2",
+      "default": "Styles"
+    },
+    {
+      "type": "text",
+      "id": "filter_3_text",
+      "label": "Filtro 3",
+      "default": "Colors"
+    },
+    {
+      "type": "text",
+      "id": "filter_4_text",
+      "label": "Filtro 4",
+      "default": "Materials"
+    },
+    {
+      "type": "text",
+      "id": "filter_5_text",
+      "label": "Filtro 5",
+      "default": "Sort by"
+    },
+    {
+      "type": "text",
+      "id": "products_label",
+      "label": "Label de contador",
+      "default": "Products"
+    },
+    {
+      "type": "text",
+      "id": "reset_text",
+      "label": "Texto reset filtros",
+      "default": "Reset Filters"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colores"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "desc_color",
+      "label": "Color de descripción",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color de texto general",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Filtros"
+    },
+    {
+      "type": "color",
+      "id": "filter_bg",
+      "label": "Fondo de botones",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "filter_active_bg",
+      "label": "Fondo activo",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "filter_color",
+      "label": "Color de texto",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "filter_border",
+      "label": "Color de borde",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "filter_active_border",
+      "label": "Color borde activo",
+      "default": "#cccccc"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Tarjetas de producto"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fondo de tarjeta",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Color de título",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Color de precio",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "sale_price_color",
+      "label": "Color precio oferta",
+      "default": "#e74c3c"
+    },
+    {
+      "type": "color",
+      "id": "compare_price_color",
+      "label": "Color precio tachado",
+      "default": "#999999"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Wishlist"
+    },
+    {
+      "type": "color",
+      "id": "wishlist_bg",
+      "label": "Fondo del botón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "wishlist_color",
+      "label": "Color del corazón",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "wishlist_active_color",
+      "label": "Color corazón activo",
+      "default": "#e74c3c"
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columnas (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Espacio entre tarjetas",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción de imagen",
+      "options": [
+        { "value": "1/1", "label": "Cuadrado (1:1)" },
+        { "value": "3/4", "label": "Vertical (3:4)" },
+        { "value": "4/3", "label": "Horizontal (4:3)" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Redondeo de tarjetas",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "filter_radius",
+      "label": "Redondeo de filtros",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Productos por página",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "PLP - Collection",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

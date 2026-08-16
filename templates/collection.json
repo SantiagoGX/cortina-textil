@@ -1,0 +1,54 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "plp",
+      "settings": {
+        "show_description": true,
+        "show_filters": true,
+        "filter_all_text": "Todos",
+        "filter_2_text": "Estilos",
+        "filter_3_text": "Colores",
+        "filter_4_text": "Materiales",
+        "filter_5_text": "Ordenar Por",
+        "products_label": "Productos",
+        "reset_text": "Reset Filters",
+        "bg_color": "#ffffff",
+        "title_color": "#000000",
+        "desc_color": "#666666",
+        "text_color": "#666666",
+        "filter_bg": "#ffffff",
+        "filter_active_bg": "#f5f5f5",
+        "filter_color": "#333333",
+        "filter_border": "#e0e0e0",
+        "filter_active_border": "#cccccc",
+        "card_bg": "#f5f5f5",
+        "card_title_color": "#333333",
+        "price_color": "#666666",
+        "sale_price_color": "#e74c3c",
+        "compare_price_color": "#999999",
+        "wishlist_bg": "#ffffff",
+        "wishlist_color": "#333333",
+        "wishlist_active_color": "#e74c3c",
+        "columns": 4,
+        "grid_gap": 20,
+        "image_ratio": "3/4",
+        "card_radius": 8,
+        "filter_radius": 20,
+        "title_size": 28,
+        "products_per_page": 12
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

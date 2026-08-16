@@ -1,0 +1,108 @@
+{% comment %}
+  snc-main-register — Formulario de registro de cliente
+{% endcomment %}
+
+<style>
+  .snc-register-{{ section.id }} {
+    margin-top: {{ section.settings.margin_top | default: 100 }}px;
+    margin-bottom: {{ section.settings.margin_bottom | default: 60 }}px;
+    padding: 0 20px;
+  }
+  .snc-register-inner-{{ section.id }} {
+    max-width: {{ section.settings.max_width | default: 390 }}px;
+    margin: 0 auto;
+  }
+  .snc-register-{{ section.id }} h1 {
+    color: {{ section.settings.title_color | default: '#000000' }};
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .snc-register-{{ section.id }} .field {
+    margin-bottom: 16px;
+  }
+  .snc-register-{{ section.id }} label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+  }
+  .snc-register-{{ section.id }} input[type="text"],
+  .snc-register-{{ section.id }} input[type="email"],
+  .snc-register-{{ section.id }} input[type="password"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .snc-register-{{ section.id }} .btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: {{ section.settings.btn_bg_color | default: '#000000' }};
+    color: {{ section.settings.btn_text_color | default: '#ffffff' }};
+    font-size: {{ section.settings.btn_font_size | default: 16 }}px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .snc-register-{{ section.id }} .register-links {
+    margin-top: 16px;
+    text-align: center;
+  }
+  .snc-register-{{ section.id }} .register-links a {
+    color: {{ section.settings.links_color | default: '#000000' }};
+    font-size: {{ section.settings.links_font_size | default: 14 }}px;
+    text-decoration: underline;
+  }
+</style>
+
+<div class="snc-register-{{ section.id }}">
+  <div class="snc-register-inner-{{ section.id }}">
+    <h1>Crear cuenta</h1>
+    {%- form 'create_customer' -%}
+      {{ form.errors | default_errors }}
+      <div class="field">
+        <label for="FirstName">Nombre</label>
+        <input type="text" name="customer[first_name]" id="FirstName" autocomplete="given-name" value="{{ form.first_name }}">
+      </div>
+      <div class="field">
+        <label for="LastName">Apellido</label>
+        <input type="text" name="customer[last_name]" id="LastName" autocomplete="family-name" value="{{ form.last_name }}">
+      </div>
+      <div class="field">
+        <label for="RegisterEmail">Correo electrónico</label>
+        <input type="email" name="customer[email]" id="RegisterEmail" autocomplete="email" autocorrect="off" autocapitalize="off" value="{{ form.email }}" required>
+      </div>
+      <div class="field">
+        <label for="RegisterPassword">Contraseña</label>
+        <input type="password" name="customer[password]" id="RegisterPassword" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn-submit">Crear cuenta</button>
+    {%- endform -%}
+    <div class="register-links">
+      <a href="{{ routes.account_login_url }}">¿Ya tienes cuenta? Inicia sesión</a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Registro",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "margin_top", "label": "Margen superior", "min": 0, "max": 300, "step": 10, "default": 100 },
+    { "type": "range", "id": "margin_bottom", "label": "Margen inferior", "min": 0, "max": 200, "step": 10, "default": 60 },
+    { "type": "number", "id": "max_width", "label": "Ancho máximo (px)", "default": 390 },
+    { "type": "color", "id": "title_color", "label": "Color título", "default": "#000000" },
+    { "type": "color", "id": "btn_bg_color", "label": "Fondo botón", "default": "#000000" },
+    { "type": "color", "id": "btn_text_color", "label": "Texto botón", "default": "#ffffff" },
+    { "type": "range", "id": "btn_font_size", "label": "Tamaño fuente botón", "min": 12, "max": 24, "step": 1, "default": 16 },
+    { "type": "color", "id": "links_color", "label": "Color enlaces", "default": "#000000" },
+    { "type": "range", "id": "links_font_size", "label": "Tamaño fuente enlaces", "min": 10, "max": 20, "step": 1, "default": 14 }
+  ],
+  "presets": [{ "name": "Registro" }]
+}
+{% endschema %}

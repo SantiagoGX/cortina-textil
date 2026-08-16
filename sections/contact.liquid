@@ -1,0 +1,483 @@
+{% comment %}
+  Contact Section - Formulario de contacto con info
+{% endcomment %}
+
+<style>
+  .contact-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#f0f0f0' }};
+    padding: 80px 20px;
+  }
+
+  .contact-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .contact-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .contact-title {
+    font-size: {{ section.settings.title_size | default: 36 }}px;
+    font-weight: {{ section.settings.title_weight | default: 500 }};
+    color: {{ section.settings.title_color | default: '#000000' }};
+    margin: 0 0 15px;
+    line-height: 1.2;
+  }
+
+  .contact-subtitle {
+    font-size: {{ section.settings.subtitle_size | default: 16 }}px;
+    font-weight: 500;
+    color: {{ section.settings.subtitle_color | default: '#666666' }};
+    margin: 0;
+    line-height: 1.5;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Formulario */
+  .contact-form {
+    margin-bottom: 40px;
+  }
+
+  .contact-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .contact-form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contact-form-group {
+    position: relative;
+  }
+
+  .contact-form-input,
+  .contact-form-textarea {
+    width: 100%;
+    padding: 16px 18px;
+    border: none;
+    border-radius: {{ section.settings.input_radius | default: 8 }}px;
+    background-color: {{ section.settings.input_bg | default: '#ffffff' }};
+    color: {{ section.settings.input_color | default: '#000000' }};
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .contact-form-input:focus,
+  .contact-form-textarea:focus {
+    box-shadow: 0 0 0 2px {{ section.settings.button_bg | default: '#7B4A2F' }}20;
+  }
+
+  .contact-form-input::placeholder,
+  .contact-form-textarea::placeholder {
+    color: {{ section.settings.placeholder_color | default: '#999999' }};
+  }
+
+  .contact-form-textarea {
+    min-height: 120px;
+    resize: vertical;
+    margin-bottom: 15px;
+  }
+
+  .contact-form-submit {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .contact-submit-btn {
+    padding: 14px 45px;
+    background-color: {{ section.settings.button_bg | default: '#7B4A2F' }};
+    color: {{ section.settings.button_color | default: '#ffffff' }};
+    border: none;
+    border-radius: {{ section.settings.button_radius | default: 25 }}px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .contact-submit-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* Separador */
+  .contact-divider {
+    height: 1px;
+    background-color: {{ section.settings.divider_color | default: '#dddddd' }};
+    margin-bottom: 30px;
+  }
+
+  /* Info Box */
+  .contact-info-box {
+    background-color: {{ section.settings.info_bg | default: '#ffffff' }};
+    border-radius: {{ section.settings.info_radius | default: 12 }}px;
+    padding: 30px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 700px) {
+    .contact-info-box {
+      flex-direction: column;
+      text-align: center;
+      gap: 25px;
+    }
+  }
+
+  .contact-info-item {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .contact-info-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: {{ section.settings.info_label_color | default: '#666666' }};
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .contact-info-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: {{ section.settings.info_value_color | default: '#000000' }};
+    margin: 0;
+  }
+
+  .contact-info-value a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .contact-info-value a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="contact-section-{{ section.id }}">
+  <div class="contact-container">
+    
+    <!-- Header -->
+    <div class="contact-header">
+      <h2 class="contact-title">{{ section.settings.title | default: '¡Queremos Escucharte!' }}</h2>
+      <p class="contact-subtitle">{{ section.settings.subtitle | default: 'Deja tu mensaje en el formulario y una persona de nuestro equipo te responderá lo antes posible con nosotros.' }}</p>
+    </div>
+
+    <!-- Formulario -->
+    {% form 'contact', id: 'ContactForm', class: 'contact-form' %}
+      {% if form.posted_successfully? %}
+        <div class="form-status form-status-list form__message" tabindex="-1" autofocus style="margin-bottom: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; color: #2e7d32;">
+          {{ 'templates.contact.form.post_success' | t }}
+        </div>
+      {% endif %}
+
+      {% if form.errors %}
+        <div class="form__message" style="margin-bottom: 20px; padding: 15px; background: #ffebee; border-radius: 8px;">
+          <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus style="color: #c62828; font-size: 14px; margin: 0 0 10px;">
+            {{ 'templates.contact.form.error_heading' | t }}
+          </h2>
+          <ul class="form-status-list caption-large" style="margin: 0; padding-left: 20px; color: #c62828;">
+            {% for error in form.errors %}
+              <li>{{ error | capitalize }} {{ form.errors.messages[error] }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="contact-form-row">
+        <div class="contact-form-group">
+          <input 
+            type="text" 
+            name="contact[name]" 
+            class="contact-form-input" 
+            placeholder="{{ section.settings.name_placeholder | default: 'Nombre' }}"
+            required
+          >
+        </div>
+        <div class="contact-form-group">
+          <input 
+            type="email" 
+            name="contact[email]" 
+            class="contact-form-input" 
+            placeholder="{{ section.settings.email_placeholder | default: 'Email' }}"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="contact-form-group">
+        <textarea 
+          name="contact[body]" 
+          class="contact-form-textarea" 
+          placeholder="{{ section.settings.message_placeholder | default: 'Mensaje' }}"
+          required
+        ></textarea>
+      </div>
+
+      <div class="contact-form-submit">
+        <button type="submit" class="contact-submit-btn">
+          {{ section.settings.button_text | default: 'Enviar' }}
+        </button>
+      </div>
+    {% endform %}
+
+    <!-- Separador -->
+    <div class="contact-divider"></div>
+
+    <!-- Info Box -->
+    <div class="contact-info-box">
+      <div class="contact-info-item">
+        <p class="contact-info-label">{{ section.settings.info1_label | default: 'Atención Al Cliente' }}</p>
+        <p class="contact-info-value">
+          <a href="mailto:{{ section.settings.info1_value | default: 'info@empresa.com' }}">
+            {{ section.settings.info1_value | default: 'info@empresa.com' }}
+          </a>
+        </p>
+      </div>
+      <div class="contact-info-item">
+        <p class="contact-info-label">{{ section.settings.info2_label | default: 'Lunes A Viernes' }}</p>
+        <p class="contact-info-value">{{ section.settings.info2_value | default: '10:00 am - 7:00 pm' }}</p>
+      </div>
+      <div class="contact-info-item">
+        <p class="contact-info-label">{{ section.settings.info3_label | default: 'Sábados' }}</p>
+        <p class="contact-info-value">{{ section.settings.info3_value | default: '10:00 am - 2:00 pm' }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contacto",
+  "tag": "section",
+  "class": "section-contact",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Colores de fondo"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo de la sección",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "input_bg",
+      "label": "Color de fondo de inputs",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "info_bg",
+      "label": "Color de fondo de info box",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "📝 Título y Subtítulo"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "¡Queremos Escucharte!"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Deja tu mensaje en el formulario y una persona de nuestro equipo te responderá lo antes posible con nosotros."
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Color del subtítulo",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "Tamaño del subtítulo",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "📧 Formulario"
+    },
+    {
+      "type": "text",
+      "id": "name_placeholder",
+      "label": "Placeholder de Nombre",
+      "default": "Nombre"
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Placeholder de Email",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "message_placeholder",
+      "label": "Placeholder de Mensaje",
+      "default": "Mensaje"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto del botón",
+      "default": "Enviar"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Color de fondo del botón",
+      "default": "#7B4A2F"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del texto del botón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_color",
+      "label": "Color de placeholder",
+      "default": "#999999"
+    },
+    {
+      "type": "range",
+      "id": "input_radius",
+      "label": "Redondeo de inputs",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Redondeo del botón",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "header",
+      "content": "📋 Info Box"
+    },
+    {
+      "type": "text",
+      "id": "info1_label",
+      "label": "Label 1",
+      "default": "Atención Al Cliente"
+    },
+    {
+      "type": "text",
+      "id": "info1_value",
+      "label": "Valor 1",
+      "default": "info@empresa.com"
+    },
+    {
+      "type": "text",
+      "id": "info2_label",
+      "label": "Label 2",
+      "default": "Lunes A Viernes"
+    },
+    {
+      "type": "text",
+      "id": "info2_value",
+      "label": "Valor 2",
+      "default": "10:00 am - 7:00 pm"
+    },
+    {
+      "type": "text",
+      "id": "info3_label",
+      "label": "Label 3",
+      "default": "Sábados"
+    },
+    {
+      "type": "text",
+      "id": "info3_value",
+      "label": "Valor 3",
+      "default": "10:00 am - 2:00 pm"
+    },
+    {
+      "type": "color",
+      "id": "info_label_color",
+      "label": "Color de los labels",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "info_value_color",
+      "label": "Color de los valores",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Color del separador",
+      "default": "#dddddd"
+    },
+    {
+      "type": "range",
+      "id": "info_radius",
+      "label": "Redondeo del info box",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Contacto",
+      "category": "Formulario"
+    }
+  ]
+}
+{% endschema %}

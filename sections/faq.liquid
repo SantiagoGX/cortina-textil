@@ -1,0 +1,437 @@
+{% comment %}
+  FAQ Section - Preguntas Frecuentes
+  Todo en un solo archivo - No requiere CSS externo
+  Ubicación: sections/faq.liquid
+{% endcomment %}
+
+{%- style -%}
+  .section-{{ section.id }} {
+    --faq-bg-color: {{ section.settings.background_color }};
+    --faq-text-color: {{ section.settings.text_color }};
+    --faq-title-size: {{ section.settings.title_size }}px;
+    --faq-item-bg: {{ section.settings.item_background }};
+    --faq-item-border: {{ section.settings.item_border_color }};
+    --faq-max-width: {{ section.settings.max_width }}px;
+    
+    background-color: var(--faq-bg-color, #f5f5f5);
+    padding: 64px 0;
+    color: var(--faq-text-color, #1a1a1a);
+  }
+
+  .section-{{ section.id }} .faq-container {
+    max-width: var(--faq-max-width, 800px);
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .section-{{ section.id }} .faq-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-{{ section.id }} .faq-title {
+    font-family: var(--font-heading-family, inherit);
+    font-size: var(--faq-title-size, 32px);
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--faq-text-color, #1a1a1a);
+    line-height: 1.2;
+  }
+
+  .section-{{ section.id }} .faq-subtitle {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--faq-text-color, #1a1a1a);
+    opacity: 0.7;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .section-{{ section.id }} .faq-subtitle p {
+    margin: 0;
+  }
+
+  .section-{{ section.id }} .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .section-{{ section.id }} .faq-item {
+    background-color: var(--faq-item-bg, #ffffff);
+    border: 1px solid var(--faq-item-border, #e5e5e5);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .section-{{ section.id }} .faq-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-color: #d0d0d0;
+  }
+
+  .section-{{ section.id }} .faq-item[open] {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .section-{{ section.id }} .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 500;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--faq-text-color, #1a1a1a);
+    transition: background-color 0.2s ease;
+    user-select: none;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+  }
+
+  .section-{{ section.id }} .faq-question::-webkit-details-marker {
+    display: none;
+  }
+
+  .section-{{ section.id }} .faq-question:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .section-{{ section.id }} .faq-question-text {
+    flex: 1;
+    padding-right: 16px;
+  }
+
+  .section-{{ section.id }} .faq-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    color: var(--faq-text-color, #1a1a1a);
+    opacity: 0.6;
+  }
+
+  .section-{{ section.id }} .faq-icon svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+  }
+
+  .section-{{ section.id }} .faq-item[open] .faq-icon svg {
+    transform: rotate(45deg);
+  }
+
+  .section-{{ section.id }} .faq-answer {
+    overflow: hidden;
+  }
+
+  .section-{{ section.id }} .faq-answer-content {
+    padding: 0 24px 20px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--faq-text-color, #1a1a1a);
+    opacity: 0.8;
+  }
+
+  .section-{{ section.id }} .faq-answer-content p:first-child {
+    margin-top: 0;
+  }
+
+  .section-{{ section.id }} .faq-answer-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-{{ section.id }} {
+      padding: 48px 0;
+    }
+    
+    .section-{{ section.id }} .faq-title {
+      font-size: calc(var(--faq-title-size, 32px) * 0.85);
+    }
+    
+    .section-{{ section.id }} .faq-question {
+      padding: 16px 20px;
+      font-size: 14px;
+    }
+    
+    .section-{{ section.id }} .faq-answer-content {
+      padding: 0 20px 16px;
+      font-size: 14px;
+    }
+    
+    .section-{{ section.id }} .faq-header {
+      margin-bottom: 40px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-{{ section.id }} .faq-item,
+    .section-{{ section.id }} .faq-icon,
+    .section-{{ section.id }} .faq-answer {
+      transition: none;
+    }
+  }
+{%- endstyle -%}
+
+<div class="faq-section section-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <div class="faq-container">
+    
+    {%- if section.settings.title != blank -%}
+      <div class="faq-header">
+        <h2 class="faq-title">{{ section.settings.title | escape }}</h2>
+        {%- if section.settings.subtitle != blank -%}
+          <div class="faq-subtitle rte">{{ section.settings.subtitle }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="faq-list" role="region" aria-label="{{ section.settings.title | default: 'Preguntas Frecuentes' }}">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'question' -%}
+            <details class="faq-item" {{ block.shopify_attributes }} {% if block.settings.open_by_default %}open{% endif %}>
+              <summary class="faq-question">
+                <span class="faq-question-text">{{ block.settings.question | escape }}</span>
+                <span class="faq-icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 1V15M1 8H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </summary>
+              <div class="faq-answer">
+                <div class="faq-answer-content rte">
+                  {{ block.settings.answer }}
+                </div>
+              </div>
+            </details>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    var sectionId = '{{ section.id }}';
+    var faqItems = document.querySelectorAll('.section-' + sectionId + ' .faq-item');
+    
+    // Accordion mode: close others when one opens
+    {% if section.settings.accordion_mode %}
+    faqItems.forEach(function(item) {
+      item.addEventListener('toggle', function() {
+        if (this.open) {
+          faqItems.forEach(function(otherItem) {
+            if (otherItem !== item && otherItem.open) {
+              otherItem.removeAttribute('open');
+            }
+          });
+        }
+      });
+    });
+    {% endif %}
+
+    // Smooth animation
+    faqItems.forEach(function(item) {
+      var summary = item.querySelector('summary');
+      var answer = item.querySelector('.faq-answer');
+      
+      summary.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (item.open) {
+          answer.style.height = answer.scrollHeight + 'px';
+          answer.offsetHeight;
+          answer.style.height = '0px';
+          answer.style.opacity = '0';
+          
+          setTimeout(function() {
+            item.removeAttribute('open');
+            answer.style.height = '';
+            answer.style.opacity = '';
+          }, 300);
+        } else {
+          item.setAttribute('open', '');
+          answer.style.height = '0px';
+          answer.style.opacity = '0';
+          answer.offsetHeight;
+          answer.style.height = answer.scrollHeight + 'px';
+          answer.style.opacity = '1';
+          
+          setTimeout(function() {
+            answer.style.height = '';
+          }, 300);
+        }
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Preguntas Frecuentes",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Preguntas Frecuentes",
+      "label": "Título de la sección"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "default": "<p>Lorem ipsum dolor sit amet consectetur. Luctus morbi et magna semper pretium. Mauris in turpis.</p>",
+      "label": "Subtítulo"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño del título",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 600,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "default": 800
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "default": "#f5f5f5",
+      "label": "Color de fondo"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "default": "#1a1a1a",
+      "label": "Color del texto"
+    },
+    {
+      "type": "color",
+      "id": "item_background",
+      "default": "#ffffff",
+      "label": "Color de fondo de items"
+    },
+    {
+      "type": "color",
+      "id": "item_border_color",
+      "default": "#e5e5e5",
+      "label": "Color del borde"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "accent-1",
+          "label": "Acento 1"
+        },
+        {
+          "value": "accent-2",
+          "label": "Acento 2"
+        },
+        {
+          "value": "background-1",
+          "label": "Fondo 1"
+        },
+        {
+          "value": "background-2",
+          "label": "Fondo 2"
+        },
+        {
+          "value": "inverse",
+          "label": "Inverso"
+        }
+      ],
+      "default": "background-1",
+      "label": "Esquema de color"
+    },
+    {
+      "type": "header",
+      "content": "Comportamiento"
+    },
+    {
+      "type": "checkbox",
+      "id": "accordion_mode",
+      "default": false,
+      "label": "Modo acordeón (solo una abierta a la vez)",
+      "info": "Si está activado, al abrir una pregunta se cierran las demás"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Pregunta",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "default": "Lorem ipsum dolor sit amet consectetur?",
+          "label": "Pregunta"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+          "label": "Respuesta"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_by_default",
+          "default": false,
+          "label": "Abierta por defecto"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Preguntas Frecuentes",
+      "category": "Texto",
+      "blocks": [
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        },
+        {
+          "type": "question"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,55 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero_kQKaYm": {
+      "type": "hero",
+      "name": "Hero",
+      "settings": {
+        "background_type": "image",
+        "image": "shopify://shop_images/319f6c08dcdbf310966142f6e59760cbd3053985.jpg",
+        "overlay_color": "#000000",
+        "overlay_opacity": 40,
+        "title": "Blog",
+        "subtitle": "Lorem ipsum dolor sit.",
+        "button_text": "Ver Productos",
+        "button_link": "",
+        "button_icon_size": 20,
+        "button_icon_offset": 0,
+        "title_color": "#ffffff",
+        "title_size": 48,
+        "title_weight": "700",
+        "subtitle_color": "#ffffff",
+        "subtitle_size": 18,
+        "subtitle_weight": "400",
+        "button_bg_color": "#a0522d",
+        "button_text_color": "#ffffff",
+        "button_size": 16,
+        "button_weight": "500"
+      }
+    },
+    "blog_m3GThG": {
+      "type": "blog",
+      "name": "Blog Grid",
+      "settings": {
+        "show_title": true,
+        "custom_title": "",
+        "posts_per_page": 12,
+        "bg_color": "#f5f5f5",
+        "card_bg": "#ffffff",
+        "text_color": "#1a1a1a"
+      }
+    }
+  },
+  "order": [
+    "hero_kQKaYm",
+    "blog_m3GThG"
+  ]
+}

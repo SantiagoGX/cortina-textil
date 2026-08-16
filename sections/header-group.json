@@ -1,0 +1,168 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Header",
+  "type": "header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "blocks": {
+        "mega_menu_column_eFAfWf": {
+          "type": "mega_menu_column",
+          "settings": {
+            "column_title": "Colección destacada ejemplo 1",
+            "column_url": "",
+            "item_1_label": "Ejemplo",
+            "item_1_collection": "",
+            "item_1_url": "",
+            "item_2_label": "Ejemplo",
+            "item_2_collection": "",
+            "item_2_url": "",
+            "item_3_label": "Ejemplo",
+            "item_3_collection": "",
+            "item_3_url": "",
+            "item_4_label": "Ejemplo",
+            "item_4_collection": "",
+            "item_4_url": "",
+            "item_5_label": "Ejemplo",
+            "item_5_collection": "",
+            "item_5_url": "",
+            "item_6_label": "",
+            "item_6_collection": "",
+            "item_6_url": ""
+          }
+        },
+        "mega_menu_column_3Xj9yM": {
+          "type": "mega_menu_column",
+          "settings": {
+            "column_title": "Colección destacada Ejemplo 2",
+            "column_url": "",
+            "item_1_label": "Ejemplo",
+            "item_1_collection": "camiseta",
+            "item_1_url": "",
+            "item_2_label": "Ejemplo",
+            "item_2_collection": "",
+            "item_2_url": "",
+            "item_3_label": "Ejemplo",
+            "item_3_collection": "",
+            "item_3_url": "",
+            "item_4_label": "",
+            "item_4_collection": "",
+            "item_4_url": "",
+            "item_5_label": "",
+            "item_5_collection": "",
+            "item_5_url": "",
+            "item_6_label": "",
+            "item_6_collection": "",
+            "item_6_url": ""
+          }
+        },
+        "mega_menu_column_9jE446": {
+          "type": "mega_menu_column",
+          "settings": {
+            "column_title": "Colección destacada Ejemplo 3",
+            "column_url": "",
+            "item_1_label": "Ejemplo",
+            "item_1_collection": "",
+            "item_1_url": "",
+            "item_2_label": "Ejemplo",
+            "item_2_collection": "",
+            "item_2_url": "",
+            "item_3_label": "Ejemplo",
+            "item_3_collection": "",
+            "item_3_url": "",
+            "item_4_label": "Ejemplo",
+            "item_4_collection": "",
+            "item_4_url": "",
+            "item_5_label": "Ejemplo",
+            "item_5_collection": "",
+            "item_5_url": "",
+            "item_6_label": "Ejemplo",
+            "item_6_collection": "",
+            "item_6_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "mega_menu_column_eFAfWf",
+        "mega_menu_column_3Xj9yM",
+        "mega_menu_column_9jE446"
+      ],
+      "settings": {
+        "header_bg": "#29354c",
+        "header_secondary_bg": "#29354c",
+        "categories_bg": "#3a567f",
+        "text_color": "#ffffff",
+        "accent_color": "#3498db",
+        "font_size_logo_line1": 18,
+        "font_weight_logo_line1": "600",
+        "font_size_logo_line2": 14,
+        "font_weight_logo_line2": "500",
+        "font_size_nav": 15,
+        "font_weight_nav": "500",
+        "font_size_dropdown": 14,
+        "font_size_categories": 14,
+        "font_weight_categories": "500",
+        "font_size_search": 15,
+        "font_size_mobile_nav": 17,
+        "font_weight_mobile_nav": "400",
+        "logo_image": "shopify://shop_images/Logo_Cortina_textil.png",
+        "logo_text_line1": "",
+        "logo_text_line2": "",
+        "search_placeholder": "Buscar",
+        "search_aria_label": "Buscar",
+        "menu_about_label": "Sobre nosotros",
+        "link_about_page": "shopify://pages/about",
+        "text_contact": "Contacto",
+        "link_contact_page": "shopify://pages/contacto",
+        "text_faq": "Preguntas frecuentes",
+        "link_faq_page": "shopify://pages/faq",
+        "text_blog": "Blog",
+        "link_blog_page": "shopify://blogs/news",
+        "category_menu": "main-menu",
+        "text_all_categories": "Todas las Categorías",
+        "link_all_categories": "",
+        "mega_menu_heading": "Explorar categorías",
+        "mega_menu_data_source": "blocks",
+        "mega_menu_columns_limit": 8,
+        "mega_menu_links_per_column": 10,
+        "mega_menu_show_counts": true,
+        "mega_menu_collections_limit": 24,
+        "mega_menu_auto_column_label": "Catálogo",
+        "mega_menu_image_alt": "Imagen destacada de categorías",
+        "mega_menu_title": "Descubre nuevas texturas",
+        "mega_menu_text": "Explora nuestras categorías y encuentra telas para cada proyecto creativo.",
+        "mega_menu_cta_label": "Ver todas las categorías",
+        "text_cat_home": "Casa",
+        "link_cat_home": "",
+        "text_cat_decorate": "Adornar",
+        "link_cat_decorate": "",
+        "text_cat_furniture": "Muebles",
+        "link_cat_furniture": "",
+        "text_cat_clothing": "Ropa",
+        "link_cat_clothing": "",
+        "text_cat_fabric": "Tejido",
+        "link_cat_fabric": "",
+        "text_cat_patterns": "Patrones de costura",
+        "link_cat_patterns": "",
+        "wishlist_label": "Favoritos",
+        "wishlist_url": "",
+        "cart_label": "Carrito",
+        "mobile_menu_open_label": "Abrir menú",
+        "mobile_menu_close_label": "Cerrar menú",
+        "nav_main_label": "Navegación principal",
+        "nav_categories_label": "Categorías de productos"
+      }
+    }
+  },
+  "order": [
+    "header"
+  ]
+}

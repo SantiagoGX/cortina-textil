@@ -1,0 +1,414 @@
+{% comment %}
+  snc-about-editorial
+  Layout editorial para página "Sobre nosotros" con contenido 100% editable.
+{% endcomment %}
+
+<style>
+  .snc-about-editorial-{{ section.id }} {
+    --editorial-bg: {{ section.settings.background_color }};
+    --editorial-text: {{ section.settings.text_color }};
+    --editorial-muted: {{ section.settings.muted_text_color }};
+    --editorial-accent: {{ section.settings.accent_color }};
+    background: var(--editorial-bg);
+    color: var(--editorial-text);
+    padding: {{ section.settings.padding_top }}px 20px {{ section.settings.padding_bottom }}px;
+  }
+
+  .snc-about-editorial__inner-{{ section.id }} {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .snc-about-editorial__eyebrow-{{ section.id }} {
+    display: inline-block;
+    margin: 0 0 14px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--editorial-accent);
+  }
+
+  .snc-about-editorial__title-{{ section.id }} {
+    margin: 0;
+    max-width: 900px;
+    font-size: clamp(32px, 5vw, 68px);
+    line-height: 1.05;
+    font-weight: 500;
+  }
+
+  .snc-about-editorial__intro-{{ section.id }} {
+    margin: 22px 0 0;
+    max-width: 740px;
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.5;
+    color: var(--editorial-muted);
+  }
+
+  .snc-about-editorial__hero-image-wrap-{{ section.id }} {
+    margin-top: 42px;
+    border-radius: {{ section.settings.image_radius }}px;
+    overflow: hidden;
+  }
+
+  .snc-about-editorial__hero-image-wrap-{{ section.id }} img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/8;
+    object-fit: cover;
+  }
+
+  .snc-about-editorial__grid-{{ section.id }} {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 44px;
+  }
+
+  .snc-about-editorial__story-title-{{ section.id }} {
+    margin: 0 0 16px;
+    font-size: clamp(26px, 3vw, 44px);
+    line-height: 1.15;
+    font-weight: 500;
+  }
+
+  .snc-about-editorial__story-body-{{ section.id }} {
+    font-size: 17px;
+    line-height: 1.85;
+    color: var(--editorial-muted);
+  }
+
+  .snc-about-editorial__story-body-{{ section.id }} p {
+    margin: 0 0 18px;
+  }
+
+  .snc-about-editorial__side-image-wrap-{{ section.id }} {
+    border-radius: {{ section.settings.image_radius }}px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .snc-about-editorial__side-image-wrap-{{ section.id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+  }
+
+  .snc-about-editorial__quote-{{ section.id }} {
+    margin: 0;
+    padding-left: 18px;
+    border-left: 2px solid var(--editorial-accent);
+    font-size: 20px;
+    line-height: 1.7;
+    color: var(--editorial-text);
+  }
+
+  .snc-about-editorial__values-{{ section.id }} {
+    margin-top: 64px;
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.values_columns }}, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .snc-about-editorial__value-card-{{ section.id }} {
+    border: 1px solid rgba(17, 17, 17, 0.12);
+    border-radius: 14px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.36);
+  }
+
+  .snc-about-editorial__value-card-{{ section.id }} h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .snc-about-editorial__value-card-{{ section.id }} p {
+    margin: 0;
+    line-height: 1.65;
+    color: var(--editorial-muted);
+  }
+
+  .snc-about-editorial__closing-{{ section.id }} {
+    margin-top: {{ section.settings.closing_spacing_top | default: 120 }}px;
+    max-width: 740px;
+  }
+
+  .snc-about-editorial__closing-image-wrap-{{ section.id }} {
+    margin-bottom: 34px;
+    border-radius: {{ section.settings.image_radius }}px;
+    overflow: hidden;
+  }
+
+  .snc-about-editorial__closing-image-wrap-{{ section.id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 16/7;
+  }
+
+  .snc-about-editorial__closing h2 {
+    margin: 0 0 14px;
+    font-size: clamp(28px, 3vw, 42px);
+    line-height: 1.15;
+    font-weight: 500;
+  }
+
+  .snc-about-editorial__closing p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.75;
+    color: var(--editorial-muted);
+  }
+
+  .snc-about-editorial__cta-{{ section.id }} {
+    margin-top: 22px;
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 12px 22px;
+    border: 1px solid var(--editorial-text);
+    color: var(--editorial-text);
+    transition: all 0.25s ease;
+  }
+
+  .snc-about-editorial__cta-{{ section.id }}:hover {
+    background: var(--editorial-text);
+    color: var(--editorial-bg);
+  }
+
+  @media screen and (max-width: 989px) {
+    .snc-about-editorial-{{ section.id }} {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .snc-about-editorial__grid-{{ section.id }} {
+      grid-template-columns: 1fr;
+      gap: 26px;
+    }
+
+    .snc-about-editorial__values-{{ section.id }} {
+      grid-template-columns: 1fr;
+      margin-bottom: 28px;
+    }
+
+    .snc-about-editorial__story-body-{{ section.id }} {
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .snc-about-editorial__quote-{{ section.id }} {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .snc-about-editorial__closing h2 {
+      font-size: clamp(26px, 8vw, 36px);
+    }
+
+    .snc-about-editorial__closing p {
+      font-size: 17px;
+      line-height: 1.68;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .snc-about-editorial-{{ section.id }} {
+      padding-top: max(42px, {{ section.settings.padding_top }}px - 20px);
+      padding-bottom: max(48px, {{ section.settings.padding_bottom }}px - 20px);
+    }
+
+    .snc-about-editorial__hero-image-wrap-{{ section.id }} {
+      margin-top: 30px;
+    }
+
+    .snc-about-editorial__hero-image-wrap-{{ section.id }} img {
+      aspect-ratio: 4/3;
+    }
+
+    .snc-about-editorial__grid-{{ section.id }} {
+      margin-top: 40px;
+      gap: 22px;
+    }
+
+    .snc-about-editorial__side-image-wrap-{{ section.id }} {
+      margin-bottom: 16px;
+    }
+
+    .snc-about-editorial__value-card-{{ section.id }} {
+      padding: 20px;
+    }
+
+    .snc-about-editorial__closing-image-wrap-{{ section.id }} {
+      margin-bottom: 24px;
+    }
+
+    .snc-about-editorial__closing-image-wrap-{{ section.id }} img {
+      aspect-ratio: 4/3;
+    }
+  }
+</style>
+
+<section class="snc-about-editorial-{{ section.id }}">
+  <div class="snc-about-editorial__inner-{{ section.id }}">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="snc-about-editorial__eyebrow-{{ section.id }}">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.title != blank -%}
+      <h1 class="snc-about-editorial__title-{{ section.id }}">{{ section.settings.title }}</h1>
+    {%- endif -%}
+
+    {%- if section.settings.intro != blank -%}
+      <div class="snc-about-editorial__intro-{{ section.id }}">{{ section.settings.intro }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.hero_image != blank -%}
+      <div class="snc-about-editorial__hero-image-wrap-{{ section.id }}">
+        <img
+          src="{{ section.settings.hero_image | image_url: width: 2200 }}"
+          alt="{{ section.settings.hero_image_alt | escape }}"
+          loading="lazy"
+          width="{{ section.settings.hero_image.width }}"
+          height="{{ section.settings.hero_image.height }}">
+      </div>
+    {%- endif -%}
+
+    <div class="snc-about-editorial__grid-{{ section.id }}">
+      <div>
+        {%- if section.settings.story_title != blank -%}
+          <h2 class="snc-about-editorial__story-title-{{ section.id }}">{{ section.settings.story_title }}</h2>
+        {%- endif -%}
+
+        {%- if section.settings.story_body != blank -%}
+          <div class="snc-about-editorial__story-body-{{ section.id }}">
+            {{ section.settings.story_body }}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div>
+        {%- if section.settings.side_image != blank -%}
+          <div class="snc-about-editorial__side-image-wrap-{{ section.id }}">
+            <img
+              src="{{ section.settings.side_image | image_url: width: 1200 }}"
+              alt="{{ section.settings.side_image_alt | escape }}"
+              loading="lazy"
+              width="{{ section.settings.side_image.width }}"
+              height="{{ section.settings.side_image.height }}">
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.quote != blank -%}
+          <blockquote class="snc-about-editorial__quote-{{ section.id }}">
+            {{ section.settings.quote }}
+          </blockquote>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="snc-about-editorial__values-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'value' -%}
+            <article class="snc-about-editorial__value-card-{{ section.id }}" {{ block.shopify_attributes }}>
+              {%- if block.settings.title != blank -%}
+                <h3>{{ block.settings.title }}</h3>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p>{{ block.settings.text }}</p>
+              {%- endif -%}
+            </article>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    <div class="snc-about-editorial__closing">
+      {%- if section.settings.closing_image != blank -%}
+        <div class="snc-about-editorial__closing-image-wrap-{{ section.id }}">
+          <img
+            src="{{ section.settings.closing_image | image_url: width: 2000 }}"
+            alt="{{ section.settings.closing_image_alt | escape }}"
+            loading="lazy"
+            width="{{ section.settings.closing_image.width }}"
+            height="{{ section.settings.closing_image.height }}">
+        </div>
+      {%- endif -%}
+      {%- if section.settings.closing_title != blank -%}
+        <h2>{{ section.settings.closing_title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.closing_text != blank -%}
+        <p>{{ section.settings.closing_text }}</p>
+      {%- endif -%}
+      {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
+        <a class="snc-about-editorial__cta-{{ section.id }}" href="{{ section.settings.cta_link }}">
+          {{ section.settings.cta_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "SNC About Editorial",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Etiqueta superior", "default": "SOBRE NOSOTROS" },
+    { "type": "text", "id": "title", "label": "Titulo principal", "default": "Creamos piezas con historia, no solo productos." },
+    { "type": "richtext", "id": "intro", "label": "Introduccion", "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus, lacus non gravida volutpat, augue lorem ultricies nibh, in dignissim arcu risus at erat.</p>" },
+    { "type": "image_picker", "id": "hero_image", "label": "Imagen principal" },
+    { "type": "text", "id": "hero_image_alt", "label": "Texto alternativo imagen principal", "default": "Imagen principal de la marca" },
+    { "type": "text", "id": "story_title", "label": "Titulo de historia", "default": "Un recorrido construido con detalle y vision" },
+    { "type": "richtext", "id": "story_body", "label": "Parrafos de historia", "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed est vel massa aliquam rutrum. Aliquam eget odio a quam fermentum pretium.</p><p>Integer sed ex ut nunc volutpat interdum. Curabitur sodales, lectus sit amet lacinia dictum, magna erat faucibus leo, ac facilisis velit augue nec lorem.</p>" },
+    { "type": "image_picker", "id": "side_image", "label": "Imagen secundaria" },
+    { "type": "text", "id": "side_image_alt", "label": "Texto alternativo imagen secundaria", "default": "Imagen secundaria de apoyo" },
+    { "type": "textarea", "id": "quote", "label": "Cita destacada", "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id justo sit amet neque lacinia gravida ut et nibh." },
+    { "type": "image_picker", "id": "closing_image", "label": "Imagen de cierre" },
+    { "type": "text", "id": "closing_image_alt", "label": "Texto alternativo imagen de cierre", "default": "Imagen de cierre sobre nosotros" },
+    { "type": "text", "id": "closing_title", "label": "Titulo de cierre", "default": "Seguimos escribiendo esta historia, capitulo a capitulo." },
+    { "type": "textarea", "id": "closing_text", "label": "Texto de cierre", "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec sem vitae elit auctor faucibus. Esta seccion tambien es completamente editable." },
+    { "type": "text", "id": "cta_label", "label": "Texto del boton", "default": "Conocer la coleccion" },
+    { "type": "url", "id": "cta_link", "label": "Enlace del boton" },
+    { "type": "range", "id": "max_width", "label": "Ancho maximo del contenido", "min": 900, "max": 1600, "step": 20, "default": 1220 },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior", "min": 20, "max": 180, "step": 10, "default": 70 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior", "min": 20, "max": 180, "step": 10, "default": 90 },
+    { "type": "range", "id": "image_radius", "label": "Radio de imagenes", "min": 0, "max": 40, "step": 2, "default": 8 },
+    { "type": "range", "id": "closing_spacing_top", "label": "Espacio antes del cierre", "min": 40, "max": 220, "step": 10, "default": 120 },
+    { "type": "range", "id": "values_columns", "label": "Columnas de valores en desktop", "min": 1, "max": 3, "step": 1, "default": 3 },
+    { "type": "color", "id": "background_color", "label": "Color de fondo", "default": "#f7f4ef" },
+    { "type": "color", "id": "text_color", "label": "Color de texto principal", "default": "#111111" },
+    { "type": "color", "id": "muted_text_color", "label": "Color de texto secundario", "default": "#4f4f4f" },
+    { "type": "color", "id": "accent_color", "label": "Color de acento", "default": "#8a6b4f" }
+  ],
+  "blocks": [
+    {
+      "type": "value",
+      "name": "Valor",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Titulo", "default": "Artesania" },
+        { "type": "textarea", "id": "text", "label": "Descripcion", "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec volutpat turpis id est efficitur." }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "SNC About Editorial",
+      "blocks": [
+        { "type": "value", "settings": { "title": "Diseno consciente", "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fermentum gravida sem vitae porta." } },
+        { "type": "value", "settings": { "title": "Calidad duradera", "text": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam." } },
+        { "type": "value", "settings": { "title": "Comunidad", "text": "Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,128 @@
+{% comment %}
+  snc-custom-content-text — Sección de contenido flexible con bloques de texto e imágenes
+{% endcomment %}
+
+<style>
+  .snc-cct-{{ section.id }} {
+    margin-top: {{ section.settings.margin_top }}px;
+    margin-bottom: {{ section.settings.margin_bottom }}px;
+  }
+  .snc-cct-inner-{{ section.id }} {
+    max-width: {{ section.settings.max_width | default: 800 }}px;
+    margin: 0 auto;
+    text-align: {{ section.settings.alignment | default: 'left' }};
+    padding: 0 20px;
+  }
+  .snc-cct-images-{{ section.id }} {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: {{ section.settings.alignment | default: 'left' }};
+  }
+  .snc-cct-images-{{ section.id }} img {
+    width: calc(50% - 10px);
+    height: auto;
+    object-fit: cover;
+  }
+  @media (max-width: 600px) {
+    .snc-cct-images-{{ section.id }} img {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="snc-cct-{{ section.id }}">
+  <div class="snc-cct-inner-{{ section.id }}">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+
+        {%- when 'text' -%}
+          <div style="
+            color: {{ block.settings.color | default: '#000000' }};
+            font-size: {{ block.settings.font_size | default: 16 }}px;
+            font-weight: {{ block.settings.font_weight | default: 400 }};
+            margin-bottom: {{ block.settings.margin_bottom | default: 15 }}px;
+            max-width: {{ block.settings.text_max_width | default: 800 }}px;
+            margin-left: auto;
+            margin-right: auto;
+          " {{ block.shopify_attributes }}>
+            {{ block.settings.text }}
+          </div>
+
+        {%- when 'images' -%}
+          <div class="snc-cct-images-{{ section.id }}" style="
+            gap: {{ block.settings.gap | default: 20 }}px;
+            margin-bottom: {{ block.settings.margin_bottom | default: 20 }}px;
+          " {{ block.shopify_attributes }}>
+            {%- if block.settings.image1 != blank -%}
+              <img
+                src="{{ block.settings.image1 | image_url: width: 800 }}"
+                alt=""
+                loading="lazy"
+                style="border-radius: {{ block.settings.border_radius | default: 8 }}px;">
+            {%- endif -%}
+            {%- if block.settings.image2 != blank -%}
+              <img
+                src="{{ block.settings.image2 | image_url: width: 800 }}"
+                alt=""
+                loading="lazy"
+                style="border-radius: {{ block.settings.border_radius | default: 8 }}px;">
+            {%- endif -%}
+          </div>
+
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contenido de texto",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "margin_top", "label": "Margen superior", "min": 0, "max": 200, "step": 5, "default": 70 },
+    { "type": "range", "id": "margin_bottom", "label": "Margen inferior", "min": 0, "max": 200, "step": 5, "default": 60 },
+    { "type": "number", "id": "max_width", "label": "Ancho máximo (px)", "default": 800 },
+    { "type": "select", "id": "alignment", "label": "Alineación", "options": [
+      { "value": "left", "label": "Izquierda" },
+      { "value": "center", "label": "Centro" },
+      { "value": "right", "label": "Derecha" }
+    ], "default": "center" }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Texto",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Texto" },
+        { "type": "color", "id": "color", "label": "Color", "default": "#000000" },
+        { "type": "range", "id": "font_size", "label": "Tamaño fuente desktop", "min": 10, "max": 80, "step": 1, "default": 16 },
+        { "type": "range", "id": "font_size_mobile", "label": "Tamaño fuente mobile", "min": 10, "max": 60, "step": 1, "default": 16 },
+        { "type": "select", "id": "font_weight", "label": "Grosor fuente", "options": [
+          { "value": "300", "label": "Light" },
+          { "value": "400", "label": "Normal" },
+          { "value": "600", "label": "Semibold" },
+          { "value": "700", "label": "Bold" }
+        ], "default": "400" },
+        { "type": "range", "id": "margin_bottom", "label": "Margen inferior", "min": 0, "max": 100, "step": 5, "default": 15 },
+        { "type": "number", "id": "text_max_width", "label": "Ancho máximo texto (px)", "default": 800 }
+      ]
+    },
+    {
+      "type": "images",
+      "name": "Imágenes",
+      "settings": [
+        { "type": "image_picker", "id": "image1", "label": "Imagen 1" },
+        { "type": "image_picker", "id": "image2", "label": "Imagen 2" },
+        { "type": "select", "id": "mobile_layout", "label": "Layout mobile", "options": [
+          { "value": "row", "label": "Fila" },
+          { "value": "column", "label": "Columna" }
+        ], "default": "row" },
+        { "type": "range", "id": "gap", "label": "Espacio entre imágenes", "min": 0, "max": 60, "step": 4, "default": 20 },
+        { "type": "range", "id": "border_radius", "label": "Radio de borde", "min": 0, "max": 40, "step": 2, "default": 8 },
+        { "type": "range", "id": "margin_bottom", "label": "Margen inferior", "min": 0, "max": 100, "step": 5, "default": 20 }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Contenido de texto" }]
+}
+{% endschema %}

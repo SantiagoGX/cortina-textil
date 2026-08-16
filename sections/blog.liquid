@@ -1,0 +1,306 @@
+{% comment %}
+  Blog Grid - DINÁMICO
+  Detecta automáticamente el blog actual de la URL
+{% endcomment %}
+
+{%- style -%}
+  .section-{{ section.id }} {
+    --blog-bg: {{ section.settings.bg_color }};
+    --blog-text: {{ section.settings.text_color }};
+    --blog-card-bg: {{ section.settings.card_bg }};
+    
+    background-color: var(--blog-bg, #f5f5f5);
+    padding: 80px 0;
+  }
+
+  .section-{{ section.id }} .blog-container {
+    max-width: 1512px;
+    margin: 0 47px;
+  }
+
+  .section-{{ section.id }} .blog-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .section-{{ section.id }} .blog-title {
+    font-family: var(--font-heading-family, inherit);
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--blog-text, #1a1a1a);
+    margin: 0;
+  }
+
+  /* Grid Masonry: alterna entre 2 y 3 columnas */
+  .section-{{ section.id }} .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 30px;
+  }
+
+  .section-{{ section.id }} .article-card {
+    background-color: var(--blog-card-bg, #ffffff);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    grid-column: span 3; /* Por defecto 2 por fila (span 3 de 6) */
+  }
+
+  /* Patrón: 2, 3, 2, 3... */
+  .section-{{ section.id }} .article-card:nth-child(5n+3),
+  .section-{{ section.id }} .article-card:nth-child(5n+4),
+  .section-{{ section.id }} .article-card:nth-child(5n+5) {
+    grid-column: span 2; /* 3 por fila (span 2 de 6) */
+  }
+
+  .section-{{ section.id }} .article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .section-{{ section.id }} .article-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 45%;
+    overflow: hidden;
+    display: block;
+  }
+
+  .section-{{ section.id }} .article-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .section-{{ section.id }} .article-card:hover .article-image {
+    transform: scale(1.05);
+  }
+
+  .section-{{ section.id }} .article-content {
+    padding: 20px;
+  }
+
+  .section-{{ section.id }} .article-title {
+    font-family: var(--font-heading-family, inherit);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 12px;
+    color: var(--blog-text, #1a1a1a);
+  }
+
+  .section-{{ section.id }} .article-title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .section-{{ section.id }} .article-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--blog-text, #1a1a1a);
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: gap 0.3s ease;
+  }
+
+  .section-{{ section.id }} .article-link:hover {
+    gap: 12px;
+  }
+
+  .section-{{ section.id }} .article-link svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .section-{{ section.id }} .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 50px;
+    list-style: none;
+    padding: 0;
+  }
+
+  .section-{{ section.id }} .pagination a,
+  .section-{{ section.id }} .pagination span {
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--blog-text, #1a1a1a);
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .section-{{ section.id }} .pagination a:hover {
+    background-color: rgba(0,0,0,0.05);
+  }
+
+  .section-{{ section.id }} .pagination .current {
+    background-color: var(--blog-text, #1a1a1a);
+    color: var(--blog-card-bg, #ffffff);
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-{{ section.id }} {
+      padding: 40px 0;
+    }
+    
+    .section-{{ section.id }} .blog-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .section-{{ section.id }} .article-card,
+    .section-{{ section.id }} .article-card:nth-child(5n+3),
+    .section-{{ section.id }} .article-card:nth-child(5n+4),
+    .section-{{ section.id }} .article-card:nth-child(5n+5) {
+      grid-column: span 1;
+    }
+    
+    .section-{{ section.id }} .article-content {
+      padding: 20px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="section-{{ section.id }}">
+  <div class="blog-container">
+    
+    {%- if section.settings.show_title -%}
+      <div class="blog-header">
+        <h2 class="blog-title">
+          {%- if section.settings.custom_title != blank -%}
+            {{ section.settings.custom_title | escape }}
+          {%- elsif blog != blank -%}
+            {{ blog.title | escape }}
+          {%- else -%}
+            Blog
+          {%- endif -%}
+        </h2>
+      </div>
+    {%- endif -%}
+
+    {% comment %}
+      ========================================
+      BLOG DINÁMICO - Usa el blog actual de la URL
+      ========================================
+    {% endcomment %}
+
+    {%- if blog != blank and blog.articles_count > 0 -%}
+      {% paginate blog.articles by section.settings.posts_per_page %}
+        <div class="blog-grid">
+          {% for article in blog.articles %}
+            <article class="article-card">
+              <a href="{{ article.url }}" class="article-image-wrapper">
+                {%- if article.image -%}
+                  {{ article.image | image_url: width: 800 | image_tag: 
+                    class: 'article-image',
+                    loading: 'lazy',
+                    alt: article.title
+                  }}
+                {%- else -%}
+                  <div class="article-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                {%- endif -%}
+              </a>
+              
+              <div class="article-content">
+                <h3 class="article-title">
+                  <a href="{{ article.url }}">{{ article.title | escape }}</a>
+                </h3>
+                
+                <a href="{{ article.url }}" class="article-link">
+                  Continuar leyendo
+                  <svg viewBox="0 0 24 24">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="pagination">
+            {{- paginate | default_pagination -}}
+          </nav>
+        {%- endif -%}
+      {% endpaginate %}
+    {%- else -%}
+      <div style="text-align: center; padding: 40px; opacity: 0.6;">
+        No hay artículos disponibles. Esta sección solo funciona en páginas de blog.
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Blog Grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "⚠️ Esta sección es DINÁMICA. Muestra automáticamente los artículos del blog actual. Funciona en páginas de blog (/blogs/nombre-blog)."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "default": true,
+      "label": "Mostrar titulo"
+    },
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "Titulo personalizado",
+      "info": "Dejar en blanco para usar el titulo del blog"
+    },
+    {
+      "type": "range",
+      "id": "posts_per_page",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "label": "Articulos por pagina",
+      "default": 7
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "default": "#f5f5f5",
+      "label": "Color fondo"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "default": "#ffffff",
+      "label": "Color tarjetas"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "default": "#1a1a1a",
+      "label": "Color texto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog Grid"
+    }
+  ]
+}
+{% endschema %}

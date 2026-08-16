@@ -1,0 +1,2379 @@
+{% comment %}
+  Header Personalizado "Telas Quedas"
+  Uso: Agregar esta sección en Theme Customizer o incluir en theme.liquid
+{% endcomment %}
+
+<style>
+  /* Reset y variables */
+  :root {
+    --header-bg: {{ section.settings.header_bg | default: '#2c3e50' }};
+    --header-secondary-bg: {{ section.settings.header_secondary_bg | default: '#34495e' }};
+    --categories-bg: {{ section.settings.categories_bg | default: '#34495e' }};
+    --text-color: {{ section.settings.text_color | default: '#ffffff' }};
+    --text-muted: #bdc3c7;
+    --accent-color: {{ section.settings.accent_color | default: '#3498db' }};
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --dropdown-bg: #ffffff;
+    --dropdown-text: #2c3e50;
+    --border-color: rgba(255, 255, 255, 0.1);
+    
+    /* Tamaños de fuente */
+    --font-size-logo-line1: {{ section.settings.font_size_logo_line1 | default: 18 }}px;
+    --font-size-logo-line2: {{ section.settings.font_size_logo_line2 | default: 14 }}px;
+    --font-size-nav: {{ section.settings.font_size_nav | default: 13 }}px;
+    --font-size-dropdown: {{ section.settings.font_size_dropdown | default: 14 }}px;
+    --font-size-categories: {{ section.settings.font_size_categories | default: 12 }}px;
+    --font-size-search: {{ section.settings.font_size_search | default: 15 }}px;
+    --font-size-mobile-nav: {{ section.settings.font_size_mobile_nav | default: 17 }}px;
+    
+    /* Grosor de fuente */
+    --font-weight-logo-line1: {{ section.settings.font_weight_logo_line1 | default: 600 }};
+    --font-weight-logo-line2: {{ section.settings.font_weight_logo_line2 | default: 500 }};
+    --font-weight-nav: {{ section.settings.font_weight_nav | default: 500 }};
+    --font-weight-categories: {{ section.settings.font_weight_categories | default: 500 }};
+    --font-weight-mobile-nav: {{ section.settings.font_weight_mobile_nav | default: 400 }};
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .custom-header {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  /* Espacio para compensar el header fijo (top + barra categorías en desktop) */
+  body {
+    padding-top: 86px;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding-top: 48px;
+    }
+
+    .custom-header {
+      height: auto;
+    }
+  }
+
+  /* Nivel Superior */
+  .header-top {
+    background-color: var(--header-bg);
+    padding: 0 2rem;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .header-top-left {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    flex: 1;
+    z-index: 1020;
+  }
+
+  /* Logo */
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: opacity 0.3s;
+  }
+
+  .logo-container:hover {
+    opacity: 0.9;
+  }
+
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  .logo-image {
+    max-height: 34px;
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .logo-text-line1 {
+    font-size: var(--font-size-logo-line1);
+    font-weight: var(--font-weight-logo-line1);
+    letter-spacing: 0.05em;
+  }
+
+  .logo-text-line2 {
+    font-size: var(--font-size-logo-line2);
+    font-weight: var(--font-weight-logo-line2);
+    letter-spacing: 0.1em;
+  }
+
+  /* Navegación Superior */
+  .top-nav-desktop {
+    display: flex;
+    align-items: center;
+  }
+
+  .top-nav {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    z-index: 1050;
+  }
+
+  .nav-item {
+    position: relative;
+    z-index: 1050;
+  }
+
+  .nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: var(--font-size-nav);
+    font-weight: var(--font-weight-nav);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0;
+    transition: color 0.3s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+
+  .nav-link:hover {
+    color: var(--accent-color);
+  }
+
+  .chevron {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s;
+  }
+
+  .nav-item.active .chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Dropdowns */
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--dropdown-bg);
+    min-width: 200px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+    list-style: none;
+    padding: 0.5rem 0;
+    border: 1px solid #e1e4e8;
+    z-index: 1100;
+  }
+
+  .nav-item.active .dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: 0.75rem 1.25rem;
+    color: var(--dropdown-text);
+    text-decoration: none;
+    font-size: var(--font-size-dropdown);
+    transition: background 0.2s;
+  }
+
+  .dropdown-link:hover {
+    background: #f8f9fa;
+    color: var(--accent-color);
+  }
+
+  /* Centro - Búsqueda */
+  .header-center {
+    flex: 2;
+    max-width: 500px;
+    margin: 0 2rem;
+    z-index: 1010;
+  }
+
+  .search-container {
+    position: relative;
+    width: 100%;
+    z-index: 100;
+  }
+
+  /* Estilos específicos del header - muy específicos para no ser sobreescritos */
+  .custom-header .search-container .search-input,
+  .header-center .search-container .search-input,
+  #search-form .search-input {
+    width: 100%;
+    padding: 0.45rem 1rem;
+    padding-right: 3rem;
+    border-radius: 25px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color) !important;
+    font-size: var(--font-size-search);
+    outline: none;
+    transition: all 0.3s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .custom-header .search-container .search-input::placeholder,
+  .header-center .search-container .search-input::placeholder,
+  #search-form .search-input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  .custom-header .search-container .search-input:focus,
+  .header-center .search-container .search-input:focus,
+  #search-form .search-input:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+    color: var(--text-color) !important;
+  }
+  
+  /* Prevenir estilos de autofill del navegador */
+  .custom-header .search-container .search-input:-webkit-autofill,
+  .custom-header .search-container .search-input:-webkit-autofill:hover,
+  .custom-header .search-container .search-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--header-bg) inset !important;
+    -webkit-text-fill-color: var(--text-color) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  /* Asegurar que el input se vea igual con o sin valor */
+  .custom-header .search-container .search-input:not(:placeholder-shown),
+  .header-center .search-container .search-input:not(:placeholder-shown),
+  #search-form .search-input:not(:placeholder-shown) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-color) !important;
+  }
+
+  /* Estilos específicos del botón de búsqueda del header */
+  .custom-header .search-container .search-btn,
+  .header-center .search-container .search-btn,
+  #search-form .search-btn {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s;
+  }
+
+  .custom-header .search-container .search-btn:hover,
+  .header-center .search-container .search-btn:hover,
+  #search-form .search-btn:hover {
+    color: var(--accent-color);
+  }
+
+  /* Autocomplete/Sugerencias */
+  .search-suggestions {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--card-bg, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none;
+    border: 1px solid var(--border-color, #e5e5e5);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  }
+
+  .search-suggestions.active {
+    display: block !important;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  
+  .search-suggestions:not(.active) {
+    pointer-events: none;
+  }
+
+  .search-suggestions-header {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted, #999999);
+    border-bottom: 1px solid var(--border-color, #e5e5e5);
+  }
+
+  .search-suggestion-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: var(--text-color, #333333);
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+  }
+
+  .search-suggestion-item:hover,
+  .search-suggestion-item.highlighted {
+    background-color: var(--hover-bg, #f5f5f5);
+  }
+
+  .search-suggestion-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: var(--image-bg, #f5f5f5);
+  }
+
+  .search-suggestion-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .search-suggestion-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-suggestion-price {
+    font-size: 13px;
+    color: var(--text-muted, #666666);
+    margin-top: 2px;
+  }
+
+  .search-suggestion-type {
+    font-size: 11px;
+    color: var(--text-muted, #999999);
+    text-transform: capitalize;
+  }
+
+  .search-suggestions-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color, #e5e5e5);
+  }
+
+  .search-suggestions-view-all {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background-color: var(--accent-color, #1a1a1a);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+  }
+
+  .search-suggestions-view-all:hover {
+    opacity: 0.9;
+  }
+
+  .search-suggestions-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--text-muted, #999999);
+    font-size: 14px;
+  }
+
+  .search-suggestions-loading {
+    padding: 24px 16px;
+    text-align: center;
+  }
+
+  .search-suggestions-loading::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color, #e5e5e5);
+    border-top-color: var(--accent-color, #1a1a1a);
+    border-radius: 50%;
+    animation: search-spin 0.8s linear infinite;
+  }
+
+  @keyframes search-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Iconos de acción */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 1010;
+  }
+
+  .action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    position: relative;
+    text-decoration: none;
+  }
+
+  .action-btn:hover {
+    background: var(--hover-bg);
+    transform: translateY(-2px);
+  }
+
+  .action-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cart-count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Contador de favoritos - igual que el carrito */
+  .wishlist-count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Nivel Inferior - Navegación Categorías */
+  .header-bottom {
+    background-color: var(--categories-bg);
+    padding: 0 2rem;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .category-nav {
+    display: flex;
+    gap: 0;
+    list-style: none;
+    width: 100%;
+  }
+
+  .category-item {
+    position: relative;
+  }
+
+  .category-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: var(--font-size-categories);
+    font-weight: var(--font-weight-categories);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    transition: all 0.3s;
+    height: 36px;
+    position: relative;
+    text-transform: none;
+  }
+
+  .category-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.3s;
+  }
+
+  .category-link:hover::after,
+  .category-link.active::after {
+    width: 100%;
+  }
+
+  .category-link:hover,
+  .category-menu-btn:hover {
+    color: var(--accent-color);
+  }
+
+  /* Mega Menú Editorial */
+  .category-item.has-mega-menu {
+    position: static;
+  }
+
+  .editorial-mega-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.16);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+    z-index: 1200;
+    pointer-events: none;
+  }
+
+  .category-item.has-mega-menu.active .editorial-mega-menu,
+  .category-item.has-mega-menu:hover .editorial-mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .editorial-mega-menu-inner {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 28px 32px 34px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .editorial-mega-menu-heading {
+    margin: 0 0 16px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6d7885;
+    font-weight: 600;
+  }
+
+  .editorial-mega-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px 24px;
+    max-height: 58vh;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+
+  .editorial-mega-menu-col-title {
+    margin: 0 0 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e9edf2;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #4b5765;
+    font-weight: 700;
+  }
+
+  .editorial-mega-menu-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    text-decoration: none;
+    color: #2e3947;
+    font-size: var(--font-size-dropdown);
+    line-height: 1.35;
+    padding: 6px 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .editorial-mega-menu-link:hover {
+    color: var(--accent-color);
+    transform: translateX(3px);
+  }
+
+  .editorial-mega-menu-count {
+    color: #97a1ac;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .editorial-mega-menu-side {
+    border: 1px solid #e6eaef;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f7f9fc;
+  }
+
+  .editorial-mega-menu-side-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4/5;
+  }
+
+  .editorial-mega-menu-side-content {
+    padding: 14px 14px 16px;
+  }
+
+  .editorial-mega-menu-side-title {
+    margin: 0 0 8px;
+    font-size: 17px;
+    line-height: 1.25;
+    color: #1f2a37;
+  }
+
+  .editorial-mega-menu-side-text {
+    margin: 0;
+    color: #5e6a78;
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .editorial-mega-menu-side-cta {
+    margin-top: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #1f2a37;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .editorial-mega-menu-side-cta:hover {
+    color: var(--accent-color);
+  }
+
+  .category-menu-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent-color);
+    transition: width 0.3s;
+  }
+
+  .category-menu-btn:hover::after,
+  .category-menu-btn.active::after {
+    width: 100%;
+  }
+
+  .menu-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Mobile Menu Toggle */
+  .mobile-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  /* Mobile toggle a la izquierda (solo móvil) */
+  .mobile-toggle-left {
+    display: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .header-top {
+      padding: 0 1rem;
+    }
+    
+    .top-nav {
+      display: none;
+    }
+    
+    .header-center {
+      margin: 0 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .header-bottom {
+      display: none;
+    }
+    
+    .header-center {
+      display: none;
+    }
+    
+    .mobile-toggle-left {
+      display: block;
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+    }
+    
+    .header-top {
+      flex-wrap: nowrap;
+      height: 48px;
+      min-height: 48px;
+      padding: 0.25rem 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .header-top-left {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: center;
+      z-index: 5;
+      max-width: 45%;
+    }
+    
+    .header-actions {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      z-index: 10;
+    }
+    
+    .header-actions .action-btn {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .header-actions .action-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .header-actions .mobile-toggle {
+      display: none;
+    }
+    
+    .logo-container {
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .logo-image {
+      max-height: 36px;
+    }
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+    }
+    
+    .logo-text-line1 {
+      font-size: 14px;
+    }
+    
+    .logo-text-line2 {
+      font-size: 11px;
+    }
+    
+    .search-mobile {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      order: 3;
+    }
+  }
+
+  /* Mobile Menu Overlay */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    background: var(--header-bg);
+    z-index: 9999;
+    transition: left 0.3s;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+
+  .mobile-menu.active {
+    left: 0;
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+  }
+
+  .mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-nav-list {
+    list-style: none;
+    margin-top: 2rem;
+  }
+
+  .mobile-nav-item {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .mobile-nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 1rem 0;
+    display: block;
+    font-size: var(--font-size-mobile-nav);
+    font-weight: var(--font-weight-mobile-nav);
+  }
+
+  .close-menu {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+  }
+
+  /* Category Menu Button Styles */
+  .category-menu-btn {
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: var(--font-size-categories);
+    font-weight: var(--font-weight-categories);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    color: var(--text-color);
+    height: 36px;
+    white-space: nowrap;
+    position: relative;
+    text-transform: none;
+  }
+
+  @media (max-width: 1200px) {
+    .editorial-mega-menu-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 900px) {
+    .editorial-mega-menu-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .editorial-mega-menu-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-height: 52vh;
+    }
+  }
+</style>
+
+{%- assign cat_menu = section.settings.category_menu | default: 'main-menu' -%}
+<header class="custom-header" role="banner">
+  <!-- Nivel Superior -->
+  <div class="header-top">
+    <!-- Mobile Menu Toggle (Solo visible en móvil) -->
+    <button class="mobile-toggle mobile-toggle-left" aria-label="{{ section.settings.mobile_menu_open_label | default: 'Abrir menú' }}" id="mobile-menu-toggle-left">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+
+    <div class="header-top-left">
+      <!-- Logo -->
+      <a href="{{ routes.root_url }}" class="logo-container">
+        {% if section.settings.logo_image != blank %}
+          <img 
+            src="{{ section.settings.logo_image | image_url: width: 200 }}" 
+            alt="{{ shop.name }}" 
+            class="logo-image"
+            width="{{ section.settings.logo_image.width }}"
+            height="{{ section.settings.logo_image.height }}"
+            loading="lazy"
+          >
+        {% else %}
+          <!-- SVG Logo Ilustrativo por defecto -->
+          <svg class="logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" stroke="white" stroke-width="2" fill="none"/>
+            <path d="M30 35 Q35 25, 45 30 T60 35 Q65 40, 60 50 Q55 60, 45 55 Q35 50, 30 35" fill="white" opacity="0.9"/>
+            <circle cx="40" cy="40" r="3" fill="#2c3e50"/>
+            <path d="M45 55 L35 75 M45 55 L55 75" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            <path d="M35 75 Q45 80, 55 75" stroke="white" stroke-width="2" fill="none"/>
+            <circle cx="65" cy="35" r="8" fill="white" opacity="0.6"/>
+            <path d="M70 60 Q75 55, 80 60" stroke="white" stroke-width="2" fill="none"/>
+          </svg>
+          <div class="logo-text">
+            <span class="logo-text-line1">{{ section.settings.logo_text_line1 | default: 'TELAS' }}</span>
+            <span class="logo-text-line2">{{ section.settings.logo_text_line2 | default: 'QUEDAS' }}</span>
+          </div>
+        {% endif %}
+      </a>
+
+      <!-- Navegación Superior Desktop -->
+      <nav class="top-nav-desktop" role="navigation" aria-label="{{ section.settings.nav_main_label | default: 'Navegación principal' }}">
+        <ul class="top-nav">
+          <li class="nav-item">
+            <a href="{{ section.settings.link_about_page | default: '/pages/sobre-nosotros' }}" class="nav-link">{{ section.settings.menu_about_label | default: 'Sobre nosotros' }}</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ section.settings.link_contact_page | default: '/pages/contacto' }}" class="nav-link">{{ section.settings.text_contact | default: 'Contacto' }}</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ section.settings.link_faq_page | default: '/pages/faq' }}" class="nav-link">{{ section.settings.text_faq | default: 'FAQs' }}</a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ section.settings.link_blog_page | default: '/blogs/news' }}" class="nav-link">{{ section.settings.text_blog | default: 'Blog' }}</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="header-center">
+      <form action="{{ routes.search_url }}" method="get" class="search-container" role="search" id="search-form">
+        <input 
+          type="search" 
+          name="q" 
+          id="search-input"
+          placeholder="{{ section.settings.search_placeholder | default: 'Buscar' }}" 
+          class="search-input"
+          value="{{ search.terms | escape }}"
+          autocomplete="off"
+          data-search-input
+        >
+        <button type="submit" class="search-btn" aria-label="{{ section.settings.search_aria_label | default: 'Buscar' }}">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </button>
+        
+        <!-- Sugerencias de búsqueda -->
+        <div class="search-suggestions" id="search-suggestions" data-search-suggestions style="display: none !important;">
+          <div class="search-suggestions-header">Sugerencias</div>
+          <div class="search-suggestions-content" data-suggestions-content></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Iconos de Acción -->
+    <div class="header-actions">
+      <button class="mobile-toggle" aria-label="{{ section.settings.mobile_menu_open_label | default: 'Abrir menú' }}" id="mobile-menu-toggle">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <a href="{{ section.settings.wishlist_url | default: '/pages/wishlist' }}" class="action-btn wishlist-icon-link" aria-label="{{ section.settings.wishlist_label | default: 'Favoritos' }}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+        <span class="wishlist-count" data-header-wishlist-count style="display: none;">0</span>
+      </a>
+
+      <a href="{{ routes.cart_url }}" class="action-btn cart-icon-link" aria-label="{{ section.settings.cart_label | default: 'Carrito' }}">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+        <span class="cart-count" data-cart-count style="{% unless cart.item_count > 0 %}display: none;{% endunless %}">{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Nivel Inferior - Categorías -->
+  <div class="header-bottom">
+    <nav class="category-nav" role="navigation" aria-label="{{ section.settings.nav_categories_label | default: 'Categorías de productos' }}">
+      <div class="category-item has-mega-menu" id="all-categories-mega-item">
+        <button type="button" class="category-link category-menu-btn" id="categories-toggle" aria-label="Abrir mega menú de categorías" aria-expanded="false">
+          <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          {{ section.settings.text_all_categories | default: 'Todas las categorías' }}
+        </button>
+        <div class="editorial-mega-menu" id="all-categories-mega-menu">
+          <div class="editorial-mega-menu-inner">
+            <div>
+              <p class="editorial-mega-menu-heading">{{ section.settings.mega_menu_heading | default: 'Explorar categorías' }}</p>
+              <div class="editorial-mega-menu-grid">
+                {%- assign mega_source = section.settings.mega_menu_data_source | default: 'navigation' -%}
+                {%- if mega_source == 'blocks' -%}
+                  {%- assign mega_links_per_column = section.settings.mega_menu_links_per_column | default: 10 -%}
+                  {%- assign rendered_cols = 0 -%}
+                  {%- assign mega_block_index = 0 -%}
+                  {%- for block in section.blocks -%}
+                    {%- if block.type == 'mega_menu_column' -%}
+                      {%- assign has_manual_items = false -%}
+                      {%- for slot in (1..6) -%}
+                        {%- assign key_lbl = 'item_' | append: slot | append: '_label' -%}
+                        {%- assign key_url = 'item_' | append: slot | append: '_url' -%}
+                        {%- assign key_col = 'item_' | append: slot | append: '_collection' -%}
+                        {%- if block.settings[key_lbl] != blank or block.settings[key_url] != blank or block.settings[key_col] != blank -%}
+                          {%- assign has_manual_items = true -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                      {%- if block.settings.column_title != blank or has_manual_items -%}
+                        {%- assign rendered_cols = rendered_cols | plus: 1 -%}
+                        <div {{ block.shopify_attributes }}>
+                          <h4 class="editorial-mega-menu-col-title">{{ block.settings.column_title | default: 'Columna' }}</h4>
+                          {%- assign manual_links_count = 0 -%}
+                          {%- for slot in (1..6) -%}
+                            {%- assign key_lbl = 'item_' | append: slot | append: '_label' -%}
+                            {%- assign key_url = 'item_' | append: slot | append: '_url' -%}
+                            {%- assign key_col = 'item_' | append: slot | append: '_collection' -%}
+                            {%- assign manual_label = block.settings[key_lbl] -%}
+                            {%- assign manual_url = block.settings[key_url] -%}
+                            {%- assign manual_collection = block.settings[key_col] -%}
+                            {%- assign resolved_label = manual_label -%}
+                            {%- assign resolved_url = manual_url -%}
+                            {%- if resolved_label == blank and manual_collection != blank -%}
+                              {%- assign resolved_label = manual_collection.title -%}
+                            {%- endif -%}
+                            {%- if resolved_url == blank and manual_collection != blank -%}
+                              {%- assign resolved_url = manual_collection.url -%}
+                            {%- endif -%}
+                            {%- if resolved_label != blank -%}
+                              {%- assign manual_links_count = manual_links_count | plus: 1 -%}
+                              <a href="{{ resolved_url | default: '#' }}" class="editorial-mega-menu-link">
+                                <span>{{ resolved_label }}</span>
+                              </a>
+                            {%- endif -%}
+                          {%- endfor -%}
+                        </div>
+                        {%- assign mega_block_index = mega_block_index | plus: 1 -%}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- if rendered_cols == 0 -%}
+                    <div>
+                      <h4 class="editorial-mega-menu-col-title">Configura tus columnas</h4>
+                      <a href="#" class="editorial-mega-menu-link">
+                        <span>Agrega bloques "Columna Mega Menú" en Visual Edits</span>
+                      </a>
+                    </div>
+                  {%- endif -%}
+                {%- elsif mega_source == 'navigation' -%}
+                  {%- assign mega_menu_handle = section.settings.mega_menu_navigation | default: cat_menu -%}
+                  {%- assign mega_columns_limit = section.settings.mega_menu_columns_limit | default: 8 -%}
+                  {%- assign mega_links_per_column = section.settings.mega_menu_links_per_column | default: 10 -%}
+                  {%- assign mega_nav_links = linklists[mega_menu_handle].links -%}
+                  {%- for mega_link in mega_nav_links limit: mega_columns_limit -%}
+                    <div>
+                      <h4 class="editorial-mega-menu-col-title">{{ mega_link.title }}</h4>
+                      {%- if mega_link.links.size > 0 -%}
+                        {%- for child_link in mega_link.links limit: mega_links_per_column -%}
+                          <a href="{{ child_link.url }}" class="editorial-mega-menu-link">
+                            <span>{{ child_link.title }}</span>
+                          </a>
+                        {%- endfor -%}
+                      {%- else -%}
+                        <a href="{{ mega_link.url }}" class="editorial-mega-menu-link">
+                          <span>{{ mega_link.title }}</span>
+                        </a>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- assign collections_per_col = section.settings.mega_menu_links_per_column | default: 10 -%}
+                  {%- assign collection_limit = section.settings.mega_menu_collections_limit | default: 24 -%}
+                  {%- assign visible_collections = 0 -%}
+                  {%- for collection in collections limit: collection_limit -%}
+                    {%- unless collection.handle == 'all' or collection.handle == 'frontpage' -%}
+                      {%- assign mod = visible_collections | modulo: collections_per_col -%}
+                      {%- if mod == 0 -%}
+                        <div>
+                          <h4 class="editorial-mega-menu-col-title">{{ section.settings.mega_menu_auto_column_label | default: 'Catálogo' }} {{ visible_collections | divided_by: collections_per_col | plus: 1 }}</h4>
+                      {%- endif -%}
+                      <a href="{{ collection.url }}" class="editorial-mega-menu-link">
+                        <span>{{ collection.title }}</span>
+                        {%- if section.settings.mega_menu_show_counts and collection.products_count > 0 -%}
+                          <span class="editorial-mega-menu-count">{{ collection.products_count }}</span>
+                        {%- endif -%}
+                      </a>
+                      {%- assign visible_collections = visible_collections | plus: 1 -%}
+                      {%- assign mod_close = visible_collections | modulo: collections_per_col -%}
+                      {%- if mod_close == 0 -%}
+                        </div>
+                      {%- endif -%}
+                    {%- endunless -%}
+                  {%- endfor -%}
+                  {%- assign remaining = visible_collections | modulo: collections_per_col -%}
+                  {%- if remaining != 0 -%}
+                    </div>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+            </div>
+            <aside class="editorial-mega-menu-side">
+              {%- if section.settings.mega_menu_image != blank -%}
+                <img
+                  class="editorial-mega-menu-side-image"
+                  src="{{ section.settings.mega_menu_image | image_url: width: 900 }}"
+                  alt="{{ section.settings.mega_menu_image_alt | escape }}"
+                  loading="lazy"
+                  width="{{ section.settings.mega_menu_image.width }}"
+                  height="{{ section.settings.mega_menu_image.height }}">
+              {%- endif -%}
+              <div class="editorial-mega-menu-side-content">
+                {%- if section.settings.mega_menu_title != blank -%}
+                  <h3 class="editorial-mega-menu-side-title">{{ section.settings.mega_menu_title }}</h3>
+                {%- endif -%}
+                {%- if section.settings.mega_menu_text != blank -%}
+                  <p class="editorial-mega-menu-side-text">{{ section.settings.mega_menu_text }}</p>
+                {%- endif -%}
+                {%- if section.settings.link_all_categories != blank -%}
+                  <a class="editorial-mega-menu-side-cta" href="{{ section.settings.link_all_categories }}">
+                    {{ section.settings.mega_menu_cta_label | default: 'Ver todas las categorías' }} →
+                  </a>
+                {%- endif -%}
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- Menú Mobile Overlay -->
+<div class="mobile-overlay" id="mobile-overlay"></div>
+
+<!-- Menú Mobile Panel -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="close-menu" id="close-menu" aria-label="{{ section.settings.mobile_menu_close_label | default: 'Cerrar menú' }}">
+    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+  
+  <ul class="mobile-nav-list">
+    <li class="mobile-nav-item"><a href="{{ section.settings.link_all_categories | default: '/collections/all' }}" class="mobile-nav-link">{{ section.settings.text_all_categories | default: 'Todas las categorías' }}</a></li>
+    {%- assign mega_source_mobile = section.settings.mega_menu_data_source | default: 'navigation' -%}
+    {%- if mega_source_mobile == 'blocks' -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'mega_menu_column' -%}
+          {%- assign has_manual_items = false -%}
+          {%- for slot in (1..6) -%}
+            {%- assign key_lbl = 'item_' | append: slot | append: '_label' -%}
+            {%- assign key_url = 'item_' | append: slot | append: '_url' -%}
+            {%- assign key_col = 'item_' | append: slot | append: '_collection' -%}
+            {%- if block.settings[key_lbl] != blank or block.settings[key_url] != blank or block.settings[key_col] != blank -%}
+              {%- assign has_manual_items = true -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if block.settings.column_title != blank or has_manual_items -%}
+            <li class="mobile-nav-item">
+              {%- if block.settings.column_url != blank -%}
+                <a href="{{ block.settings.column_url }}" class="mobile-nav-link">{{ block.settings.column_title }}</a>
+              {%- elsif block.settings.column_title != blank -%}
+                <span class="mobile-nav-link" style="opacity: 0.9;">{{ block.settings.column_title }}</span>
+              {%- endif -%}
+              {%- assign mobile_manual_count = 0 -%}
+              {%- for slot in (1..6) -%}
+                {%- assign key_lbl = 'item_' | append: slot | append: '_label' -%}
+                {%- assign key_url = 'item_' | append: slot | append: '_url' -%}
+                {%- assign key_col = 'item_' | append: slot | append: '_collection' -%}
+                {%- assign manual_label = block.settings[key_lbl] -%}
+                {%- assign manual_url = block.settings[key_url] -%}
+                {%- assign manual_collection = block.settings[key_col] -%}
+                {%- assign resolved_label = manual_label -%}
+                {%- assign resolved_url = manual_url -%}
+                {%- if resolved_label == blank and manual_collection != blank -%}
+                  {%- assign resolved_label = manual_collection.title -%}
+                {%- endif -%}
+                {%- if resolved_url == blank and manual_collection != blank -%}
+                  {%- assign resolved_url = manual_collection.url -%}
+                {%- endif -%}
+                {%- if resolved_label != blank -%}
+                  {%- assign mobile_manual_count = mobile_manual_count | plus: 1 -%}
+                  <a href="{{ resolved_url | default: '#' }}" class="mobile-nav-link" style="padding-left: 2rem; font-size: 0.9em; opacity: 0.8;">↳ {{ resolved_label }}</a>
+                {%- endif -%}
+              {%- endfor -%}
+            </li>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for link in linklists[cat_menu].links -%}
+        <li class="mobile-nav-item">
+          <a href="{{ link.url }}" class="mobile-nav-link">{{ link.title }}</a>
+          {%- if link.links.size > 0 -%}
+            {%- for child_link in link.links -%}
+              <a href="{{ child_link.url }}" class="mobile-nav-link" style="padding-left: 2rem; font-size: 0.9em; opacity: 0.8;">↳ {{ child_link.title }}</a>
+            {%- endfor -%}
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    {%- endif -%}
+    <li class="mobile-nav-item" style="margin-top: 2rem; border-top: 2px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+      <a href="{{ section.settings.link_about_page | default: '/pages/sobre-nosotros' }}" class="mobile-nav-link">{{ section.settings.menu_about_label | default: 'Sobre nosotros' }}</a>
+    </li>
+    <li class="mobile-nav-item"><a href="{{ section.settings.link_contact_page | default: '/pages/contacto' }}" class="mobile-nav-link">{{ section.settings.text_contact | default: 'Contacto' }}</a></li>
+    <li class="mobile-nav-item"><a href="{{ section.settings.link_faq_page | default: '/pages/faq' }}" class="mobile-nav-link">{{ section.settings.text_faq | default: 'FAQs' }}</a></li>
+    <li class="mobile-nav-item"><a href="{{ section.settings.link_blog_page | default: '/blogs/news' }}" class="mobile-nav-link">{{ section.settings.text_blog | default: 'Blog' }}</a></li>
+  </ul>
+</div>
+
+<script>
+  (function() {
+    // Dropdowns Desktop (solo si existen elementos con data-dropdown)
+    const navItems = document.querySelectorAll('.nav-item[data-dropdown]');
+    
+    if (navItems.length > 0) {
+      navItems.forEach(item => {
+        const link = item.querySelector('.nav-link');
+        
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          
+          // Cerrar otros dropdowns
+          navItems.forEach(otherItem => {
+            if (otherItem !== item) {
+              otherItem.classList.remove('active');
+              otherItem.querySelector('.nav-link').setAttribute('aria-expanded', 'false');
+            }
+          });
+          
+          // Toggle actual
+          item.classList.toggle('active');
+          const isExpanded = item.classList.contains('active');
+          link.setAttribute('aria-expanded', isExpanded);
+        });
+      });
+
+      // Cerrar dropdowns al hacer click fuera
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-item')) {
+          navItems.forEach(item => {
+            item.classList.remove('active');
+            item.querySelector('.nav-link').setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
+    }
+
+    // Mobile Menu
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const mobileToggleLeft = document.getElementById('mobile-menu-toggle-left');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const closeMenu = document.getElementById('close-menu');
+
+    function openMenu() {
+      mobileMenu.classList.add('active');
+      mobileOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenuFn() {
+      mobileMenu.classList.remove('active');
+      mobileOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    mobileToggle.addEventListener('click', openMenu);
+    if (mobileToggleLeft) mobileToggleLeft.addEventListener('click', openMenu);
+    closeMenu.addEventListener('click', closeMenuFn);
+    mobileOverlay.addEventListener('click', closeMenuFn);
+
+    // Cerrar con tecla Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMenuFn();
+        setMegaMenuState(false);
+        if (navItems.length > 0) {
+          navItems.forEach(item => {
+            item.classList.remove('active');
+            item.querySelector('.nav-link').setAttribute('aria-expanded', 'false');
+          });
+        }
+      }
+    });
+
+    // Mega menú "Todas las categorías" (desktop)
+    const categoriesToggle = document.getElementById('categories-toggle');
+    const megaItem = document.getElementById('all-categories-mega-item');
+    let megaCloseTimer = null;
+
+    function setMegaMenuState(isOpen) {
+      if (!megaItem || !categoriesToggle) return;
+      megaItem.classList.toggle('active', isOpen);
+      categoriesToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    if (categoriesToggle && megaItem) {
+      categoriesToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const isOpen = megaItem.classList.contains('active');
+        setMegaMenuState(!isOpen);
+      });
+
+      megaItem.addEventListener('mouseenter', () => {
+        if (window.innerWidth <= 768) return;
+        clearTimeout(megaCloseTimer);
+        setMegaMenuState(true);
+      });
+
+      megaItem.addEventListener('mouseleave', () => {
+        if (window.innerWidth <= 768) return;
+        megaCloseTimer = setTimeout(() => setMegaMenuState(false), 120);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#all-categories-mega-item')) {
+          setMegaMenuState(false);
+        }
+      });
+    }
+
+    // ============================================
+    // WISHLIST / FAVORITOS - CONTADOR EN TIEMPO REAL
+    // ============================================
+    
+    // Limpiar datos antiguos del localStorage
+    (function cleanupOldWishlistData() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        const validItems = wishlist.filter(item => typeof item === 'string' && !/^\d+$/.test(item));
+        if (validItems.length !== wishlist.length) {
+          localStorage.setItem('wishlist', JSON.stringify(validItems));
+        }
+      } catch (e) {}
+    })();
+
+    // Función para obtener wishlist del localStorage
+    function getWishlist() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        // Filtrar solo handles válidos (strings, no IDs numéricos antiguos)
+        return wishlist.filter(item => typeof item === 'string' && !/^\d+$/.test(item));
+      } catch (e) {
+        return [];
+      }
+    }
+    
+    // Función para actualizar contador de favoritos en el header
+    function updateHeaderWishlistCount(count) {
+      const counters = document.querySelectorAll('[data-header-wishlist-count]');
+      
+      counters.forEach(counter => {
+        counter.textContent = count;
+        
+        if (count > 0) {
+          counter.style.display = 'flex';
+          counter.style.visibility = 'visible';
+          counter.style.opacity = '1';
+        } else {
+          counter.style.display = 'none';
+        }
+        
+        // Animación
+        counter.style.transform = 'scale(1.4)';
+        setTimeout(() => {
+          counter.style.transform = 'scale(1)';
+        }, 200);
+      });
+    }
+    
+    // Actualizar contador al cargar la página
+    const initialWishlist = getWishlist();
+    updateHeaderWishlistCount(initialWishlist.length);
+    
+    // Escuchar eventos de wishlist desde cualquier página
+    window.addEventListener('wishlist:updated', function(e) {
+      if (e.detail && typeof e.detail.count !== 'undefined') {
+        updateHeaderWishlistCount(e.detail.count);
+      } else {
+        // Si no viene el count, leer del localStorage
+        updateHeaderWishlistCount(getWishlist().length);
+      }
+    });
+    
+    // También escuchar el evento storage (si se actualiza en otra pestaña)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'wishlist') {
+        const wishlist = getWishlist();
+        updateHeaderWishlistCount(wishlist.length);
+      }
+    });
+    
+    // ACTUALIZAR CONTADOR DEL CARRITO EN TIEMPO REAL
+    function updateHeaderCartCount(count) {
+      const counters = document.querySelectorAll('.cart-count, [data-cart-count]');
+      
+      counters.forEach(counter => {
+        counter.textContent = count;
+        
+        if (count > 0) {
+          counter.style.display = 'flex';
+          counter.style.visibility = 'visible';
+          counter.style.opacity = '1';
+        } else {
+          counter.style.display = 'none';
+        }
+        
+        // Animación
+        counter.style.transform = 'scale(1.4)';
+        setTimeout(() => {
+          counter.style.transform = 'scale(1)';
+        }, 200);
+      });
+    }
+    
+    // Escuchar evento personalizado del PDP
+    window.addEventListener('cart:updated', function(e) {
+      if (e.detail && typeof e.detail.itemCount !== 'undefined') {
+        updateHeaderCartCount(e.detail.itemCount);
+      }
+    });
+    
+    // También escuchar cambios en el carrito desde otras páginas
+    document.addEventListener('click', function(e) {
+      // Si se hizo clic en un botón de agregar al carrito
+      if (e.target.closest('[data-ajax-cart] button[type="submit"], .add-to-cart, [data-add-to-cart]')) {
+        // Esperar un momento y actualizar el contador
+        setTimeout(() => {
+          fetch('/cart.js?v=' + Date.now())
+            .then(r => r.json())
+            .then(cart => updateHeaderCartCount(cart.item_count))
+            .catch(err => console.error('Error:', err));
+        }, 500);
+      }
+    });
+
+    // ============================================
+    // BÚSQUEDA CON SUGERENCIAS EN TIEMPO REAL
+    // ============================================
+    const searchInput = document.getElementById('search-input');
+    const searchSuggestions = document.getElementById('search-suggestions');
+    const suggestionsContent = document.querySelector('[data-suggestions-content]');
+    
+    if (searchInput && searchSuggestions) {
+      let searchTimeout;
+      let highlightedIndex = -1;
+      
+      // Al cargar la página, asegurarse de que las sugerencias estén cerradas
+      searchSuggestions.classList.remove('active');
+      searchSuggestions.style.cssText = 'display: none !important; opacity: 0; visibility: hidden;';
+      
+      // Función para buscar sugerencias
+      async function fetchSuggestions(query) {
+        if (!query || query.length < 2) {
+          searchSuggestions.classList.remove('active');
+          return;
+        }
+        
+        try {
+          suggestionsContent.innerHTML = '<div class="search-suggestions-loading"></div>';
+          searchSuggestions.classList.add('active');
+          
+          // Usar la API de búsqueda de Shopify
+          const response = await fetch(`/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product,collection,article,page&resources[limit]=8`);
+          const data = await response.json();
+          
+          if (!data.resources || !data.resources.results) {
+            searchSuggestions.classList.remove('active');
+            return;
+          }
+          
+          const results = data.resources.results;
+          let html = '';
+          let totalResults = 0;
+          
+          // Productos
+          if (results.products && results.products.length > 0) {
+            totalResults += results.products.length;
+            results.products.forEach(product => {
+              const image = product.image ? product.image.replace('\\/', '/') : '';
+              html += `
+                <a href="${product.url}" class="search-suggestion-item" data-suggestion>
+                  ${image ? `<img src="${image}" alt="" class="search-suggestion-image">` : '<div class="search-suggestion-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>'}
+                  <div class="search-suggestion-info">
+                    <p class="search-suggestion-title">${product.title}</p>
+                    <p class="search-suggestion-price">${product.price}</p>
+                  </div>
+                  <span class="search-suggestion-type">Producto</span>
+                </a>
+              `;
+            });
+          }
+          
+          // Colecciones
+          if (results.collections && results.collections.length > 0) {
+            totalResults += results.collections.length;
+            results.collections.forEach(collection => {
+              html += `
+                <a href="${collection.url}" class="search-suggestion-item" data-suggestion>
+                  <div class="search-suggestion-image" style="background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);"></div>
+                  <div class="search-suggestion-info">
+                    <p class="search-suggestion-title">${collection.title}</p>
+                  </div>
+                  <span class="search-suggestion-type">Colección</span>
+                </a>
+              `;
+            });
+          }
+          
+          // Artículos
+          if (results.articles && results.articles.length > 0) {
+            totalResults += results.articles.length;
+            results.articles.forEach(article => {
+              html += `
+                <a href="${article.url}" class="search-suggestion-item" data-suggestion>
+                  <div class="search-suggestion-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                  <div class="search-suggestion-info">
+                    <p class="search-suggestion-title">${article.title}</p>
+                  </div>
+                  <span class="search-suggestion-type">Artículo</span>
+                </a>
+              `;
+            });
+          }
+          
+          // Páginas
+          if (results.pages && results.pages.length > 0) {
+            totalResults += results.pages.length;
+            results.pages.forEach(page => {
+              html += `
+                <a href="${page.url}" class="search-suggestion-item" data-suggestion>
+                  <div class="search-suggestion-image" style="background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    </svg>
+                  </div>
+                  <div class="search-suggestion-info">
+                    <p class="search-suggestion-title">${page.title}</p>
+                  </div>
+                  <span class="search-suggestion-type">Página</span>
+                </a>
+              `;
+            });
+          }
+          
+          if (totalResults === 0) {
+            html = '<div class="search-suggestions-empty">No se encontraron resultados</div>';
+          } else {
+            // Agregar footer con "Ver todos los resultados"
+            html += `
+              <div class="search-suggestions-footer">
+                <a href="/search?q=${encodeURIComponent(query)}" class="search-suggestions-view-all">
+                  Ver todos los resultados (${totalResults})
+                </a>
+              </div>
+            `;
+          }
+          
+          suggestionsContent.innerHTML = html;
+          highlightedIndex = -1;
+          
+        } catch (error) {
+          console.error('Error fetching suggestions:', error);
+          searchSuggestions.classList.remove('active');
+        }
+      }
+      
+      // Función para cerrar sugerencias definitivamente
+      function closeSuggestions() {
+        searchSuggestions.classList.remove('active');
+        searchSuggestions.style.cssText = 'display: none !important; opacity: 0; visibility: hidden;';
+        highlightedIndex = -1;
+        searchInput.blur();
+      }
+      
+      // Cerrar sugerencias al enviar el formulario
+      searchInput.closest('form').addEventListener('submit', function(e) {
+        closeSuggestions();
+      });
+      
+      // También cerrar cuando el input pierde el foco
+      searchInput.addEventListener('blur', function() {
+        setTimeout(() => {
+          if (!searchSuggestions.matches(':hover')) {
+            closeSuggestions();
+          }
+        }, 200);
+      });
+      
+      // Evento input con debounce
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+          searchSuggestions.classList.remove('active');
+          return;
+        }
+        
+        searchTimeout = setTimeout(() => {
+          fetchSuggestions(query);
+        }, 300); // Esperar 300ms después de que el usuario deje de escribir
+      });
+      
+      // Navegación con teclado
+      searchInput.addEventListener('keydown', function(e) {
+        const items = searchSuggestions.querySelectorAll('[data-suggestion]');
+        
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+          updateHighlight(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          highlightedIndex = Math.max(highlightedIndex - 1, -1);
+          updateHighlight(items);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (highlightedIndex >= 0 && items[highlightedIndex]) {
+            items[highlightedIndex].click();
+          } else {
+            // Si no hay item seleccionado, cerrar sugerencias y enviar el formulario
+            searchSuggestions.classList.remove('active');
+            searchSuggestions.style.display = 'none';
+            highlightedIndex = -1;
+            searchInput.blur();
+            
+            // Enviar el formulario después de un pequeño delay para cerrar las sugerencias
+            setTimeout(() => {
+              searchInput.closest('form').submit();
+            }, 50);
+          }
+        } else if (e.key === 'Escape') {
+          searchSuggestions.classList.remove('active');
+          highlightedIndex = -1;
+        }
+      });
+      
+      function updateHighlight(items) {
+        items.forEach((item, index) => {
+          if (index === highlightedIndex) {
+            item.classList.add('highlighted');
+            item.scrollIntoView({ block: 'nearest' });
+          } else {
+            item.classList.remove('highlighted');
+          }
+        });
+      }
+      
+      // Cerrar sugerencias al hacer clic fuera
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('#search-form')) {
+          closeSuggestions();
+        }
+      });
+      
+      // Cerrar sugerencias antes de salir de la página
+      window.addEventListener('beforeunload', function() {
+        closeSuggestions();
+      });
+      
+      // Prevenir cierre al hacer clic dentro de las sugerencias
+      searchSuggestions.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Header Personalizado",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Colores"
+    },
+    {
+      "type": "color",
+      "id": "header_bg",
+      "label": "Color de fondo superior",
+      "default": "#2c3e50"
+    },
+    {
+      "type": "color",
+      "id": "header_secondary_bg",
+      "label": "Color de fondo inferior",
+      "default": "#34495e"
+    },
+    {
+      "type": "color",
+      "id": "categories_bg",
+      "label": "Color de fondo barra de categorías",
+      "default": "#34495e"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color de texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Color de acento (hover, badges)",
+      "default": "#3498db"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Tipografía"
+    },
+    {
+      "type": "range",
+      "id": "font_size_logo_line1",
+      "label": "Tamaño: Logo línea 1",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "font_weight_logo_line1",
+      "label": "Grosor: Logo línea 1",
+      "options": [
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medio (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "font_size_logo_line2",
+      "label": "Tamaño: Logo línea 2",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "font_weight_logo_line2",
+      "label": "Grosor: Logo línea 2",
+      "options": [
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medio (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "font_size_nav",
+      "label": "Tamaño: Navegación superior",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "font_weight_nav",
+      "label": "Grosor: Navegación superior",
+      "options": [
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medio (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "font_size_dropdown",
+      "label": "Tamaño: Menús desplegables",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "font_size_categories",
+      "label": "Tamaño: Categorías",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "font_weight_categories",
+      "label": "Grosor: Categorías",
+      "options": [
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medio (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "font_size_search",
+      "label": "Tamaño: Campo de búsqueda",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile_nav",
+      "label": "Tamaño: Menú móvil",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "select",
+      "id": "font_weight_mobile_nav",
+      "label": "Grosor: Menú móvil",
+      "options": [
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medio (500)" },
+        { "value": "600", "label": "Semibold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Imagen del logo (PNG/SVG)",
+      "info": "Si subes una imagen, se mostrará en lugar del logo por defecto"
+    },
+    {
+      "type": "text",
+      "id": "logo_text_line1",
+      "label": "Texto línea 1 (sin imagen)",
+      "default": "TELAS",
+      "info": "Se muestra cuando no hay imagen de logo"
+    },
+    {
+      "type": "text",
+      "id": "logo_text_line2",
+      "label": "Texto línea 2 (sin imagen)",
+      "default": "QUEDAS",
+      "info": "Se muestra cuando no hay imagen de logo"
+    },
+    {
+      "type": "header",
+      "content": "🔍 Búsqueda"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Placeholder del buscador",
+      "default": "Buscar"
+    },
+    {
+      "type": "text",
+      "id": "search_aria_label",
+      "label": "Etiqueta accesibilidad (aria-label) búsqueda",
+      "default": "Buscar"
+    },
+    {
+      "type": "header",
+      "content": "📑 Enlaces de Navegación"
+    },
+    {
+      "type": "text",
+      "id": "menu_about_label",
+      "label": "Texto: Sobre nosotros",
+      "default": "Sobre nosotros"
+    },
+    {
+      "type": "url",
+      "id": "link_about_page",
+      "label": "Enlace: Sobre nosotros"
+    },
+    {
+      "type": "text",
+      "id": "text_contact",
+      "label": "Texto: Contacto",
+      "default": "Contacto"
+    },
+    {
+      "type": "url",
+      "id": "link_contact_page",
+      "label": "Enlace: Contacto"
+    },
+    {
+      "type": "text",
+      "id": "text_faq",
+      "label": "Texto: FAQs",
+      "default": "FAQs"
+    },
+    {
+      "type": "url",
+      "id": "link_faq_page",
+      "label": "Enlace: FAQs"
+    },
+    {
+      "type": "text",
+      "id": "text_blog",
+      "label": "Texto: Blog",
+      "default": "Blog"
+    },
+    {
+      "type": "url",
+      "id": "link_blog_page",
+      "label": "Enlace: Blog"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Categorías de Navegación"
+    },
+    {
+      "type": "link_list",
+      "id": "category_menu",
+      "label": "Menú de categorías",
+      "info": "Crear en Online Store → Navigation. Soporta sub-ítems para Mega Menú.",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "text_all_categories",
+      "label": "Texto: Todas las categorías",
+      "default": "Todas las categorías"
+    },
+    {
+      "type": "url",
+      "id": "link_all_categories",
+      "label": "Enlace: Todas las categorías"
+    },
+    {
+      "type": "text",
+      "id": "mega_menu_heading",
+      "label": "Título pequeño del mega menú",
+      "default": "Explorar categorías"
+    },
+    {
+      "type": "select",
+      "id": "mega_menu_data_source",
+      "label": "Origen de datos del mega menú",
+      "options": [
+        { "value": "blocks", "label": "Bloques individuales (fácil para cliente)" },
+        { "value": "collections", "label": "Colecciones automáticas" }
+      ],
+      "default": "blocks"
+    },
+    {
+      "type": "range",
+      "id": "mega_menu_columns_limit",
+      "label": "Máximo de columnas visibles (modo navegación)",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "mega_menu_links_per_column",
+      "label": "Máximo de links por columna",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "mega_menu_show_counts",
+      "label": "Mostrar contador de productos (solo colecciones automáticas)",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "mega_menu_collections_limit",
+      "label": "Cantidad máxima de colecciones en mega menú",
+      "min": 8,
+      "max": 40,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "text",
+      "id": "mega_menu_auto_column_label",
+      "label": "Etiqueta de columna (modo colecciones automáticas)",
+      "default": "Catálogo"
+    },
+    {
+      "type": "image_picker",
+      "id": "mega_menu_image",
+      "label": "Imagen destacada del mega menú"
+    },
+    {
+      "type": "text",
+      "id": "mega_menu_image_alt",
+      "label": "Texto alternativo imagen mega menú",
+      "default": "Imagen destacada de categorías"
+    },
+    {
+      "type": "text",
+      "id": "mega_menu_title",
+      "label": "Título panel lateral mega menú",
+      "default": "Descubre nuevas texturas"
+    },
+    {
+      "type": "textarea",
+      "id": "mega_menu_text",
+      "label": "Texto panel lateral mega menú",
+      "default": "Explora nuestras categorías y encuentra telas para cada proyecto creativo."
+    },
+    {
+      "type": "text",
+      "id": "mega_menu_cta_label",
+      "label": "Texto botón panel lateral",
+      "default": "Ver todas las categorías"
+    },
+    {
+      "type": "text",
+      "id": "text_cat_home",
+      "label": "Texto: Casa",
+      "default": "Casa"
+    },
+    {
+      "type": "url",
+      "id": "link_cat_home",
+      "label": "Enlace: Casa"
+    },
+    {
+      "type": "text",
+      "id": "text_cat_decorate",
+      "label": "Texto: Adornar",
+      "default": "Adornar"
+    },
+    {
+      "type": "url",
+      "id": "link_cat_decorate",
+      "label": "Enlace: Adornar"
+    },
+    {
+      "type": "text",
+      "id": "text_cat_furniture",
+      "label": "Texto: Muebles",
+      "default": "Muebles"
+    },
+    {
+      "type": "url",
+      "id": "link_cat_furniture",
+      "label": "Enlace: Muebles"
+    },
+    {
+      "type": "text",
+      "id": "text_cat_clothing",
+      "label": "Texto: Ropa",
+      "default": "Ropa"
+    },
+    {
+      "type": "url",
+      "id": "link_cat_clothing",
+      "label": "Enlace: Ropa"
+    },
+    {
+      "type": "text",
+      "id": "text_cat_fabric",
+      "label": "Texto: Tejido",
+      "default": "Tejido"
+    },
+    {
+      "type": "url",
+      "id": "link_cat_fabric",
+      "label": "Enlace: Tejido"
+    },
+    {
+      "type": "text",
+      "id": "text_cat_patterns",
+      "label": "Texto: Patrones de costura",
+      "default": "Patrones de costura"
+    },
+    {
+      "type": "url",
+      "id": "link_cat_patterns",
+      "label": "Enlace: Patrones de costura"
+    },
+    {
+      "type": "header",
+      "content": "👤 Iconos de Acción"
+    },
+    {
+      "type": "text",
+      "id": "wishlist_label",
+      "label": "Etiqueta: Favoritos",
+      "default": "Favoritos"
+    },
+    {
+      "type": "url",
+      "id": "wishlist_url",
+      "label": "URL: Página de favoritos",
+      "info": "Dejar vacío para usar /pages/wishlist"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Etiqueta: Carrito",
+      "default": "Carrito"
+    },
+    {
+      "type": "header",
+      "content": "📱 Menú Móvil"
+    },
+    {
+      "type": "text",
+      "id": "mobile_menu_open_label",
+      "label": "Etiqueta: Abrir menú",
+      "default": "Abrir menú"
+    },
+    {
+      "type": "text",
+      "id": "mobile_menu_close_label",
+      "label": "Etiqueta: Cerrar menú",
+      "default": "Cerrar menú"
+    },
+    {
+      "type": "header",
+      "content": "♿ Accesibilidad"
+    },
+    {
+      "type": "text",
+      "id": "nav_main_label",
+      "label": "Aria-label: Navegación principal",
+      "default": "Navegación principal"
+    },
+    {
+      "type": "text",
+      "id": "nav_categories_label",
+      "label": "Aria-label: Categorías de productos",
+      "default": "Categorías de productos"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu_column",
+      "name": "Columna Mega Menú",
+      "settings": [
+        {
+          "type": "text",
+          "id": "column_title",
+          "label": "Título de columna",
+          "default": "Colección destacada"
+        },
+        {
+          "type": "url",
+          "id": "column_url",
+          "label": "Enlace del título (opcional)"
+        },
+        {
+          "type": "header",
+          "content": "Items de la columna (opcionales)"
+        },
+        {
+          "type": "text",
+          "id": "item_1_label",
+          "label": "Item 1 - Texto"
+        },
+        {
+          "type": "collection",
+          "id": "item_1_collection",
+          "label": "Item 1 - Colección"
+        },
+        {
+          "type": "url",
+          "id": "item_1_url",
+          "label": "Item 1 - URL personalizada"
+        },
+        {
+          "type": "text",
+          "id": "item_2_label",
+          "label": "Item 2 - Texto"
+        },
+        {
+          "type": "collection",
+          "id": "item_2_collection",
+          "label": "Item 2 - Colección"
+        },
+        {
+          "type": "url",
+          "id": "item_2_url",
+          "label": "Item 2 - URL personalizada"
+        },
+        {
+          "type": "text",
+          "id": "item_3_label",
+          "label": "Item 3 - Texto"
+        },
+        {
+          "type": "collection",
+          "id": "item_3_collection",
+          "label": "Item 3 - Colección"
+        },
+        {
+          "type": "url",
+          "id": "item_3_url",
+          "label": "Item 3 - URL personalizada"
+        },
+        {
+          "type": "text",
+          "id": "item_4_label",
+          "label": "Item 4 - Texto"
+        },
+        {
+          "type": "collection",
+          "id": "item_4_collection",
+          "label": "Item 4 - Colección"
+        },
+        {
+          "type": "url",
+          "id": "item_4_url",
+          "label": "Item 4 - URL personalizada"
+        },
+        {
+          "type": "text",
+          "id": "item_5_label",
+          "label": "Item 5 - Texto"
+        },
+        {
+          "type": "collection",
+          "id": "item_5_collection",
+          "label": "Item 5 - Colección"
+        },
+        {
+          "type": "url",
+          "id": "item_5_url",
+          "label": "Item 5 - URL personalizada"
+        },
+        {
+          "type": "text",
+          "id": "item_6_label",
+          "label": "Item 6 - Texto"
+        },
+        {
+          "type": "collection",
+          "id": "item_6_collection",
+          "label": "Item 6 - Colección"
+        },
+        {
+          "type": "url",
+          "id": "item_6_url",
+          "label": "Item 6 - URL personalizada"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 16,
+  "presets": [
+    {
+      "name": "Header Telas Quedas",
+      "category": "Header"
+    }
+  ]
+}
+{% endschema %}

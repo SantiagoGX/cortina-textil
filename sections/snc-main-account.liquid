@@ -1,0 +1,135 @@
+{% comment %}
+  snc-main-account — Página de cuenta del cliente
+{% endcomment %}
+
+<style>
+  .snc-account-{{ section.id }} {
+    margin-top: {{ section.settings.margin_top | default: 170 }}px;
+    margin-bottom: {{ section.settings.margin_bottom | default: 80 }}px;
+    padding: 0 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .snc-account-{{ section.id }} h1,
+  .snc-account-{{ section.id }} h2 {
+    color: {{ section.settings.main_color | default: '#000000' }};
+  }
+  .snc-account-{{ section.id }} h1 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .snc-account-{{ section.id }} h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 32px 0 12px;
+  }
+  .snc-account-logout {
+    font-size: 14px;
+    color: #666;
+    text-decoration: underline;
+    margin-bottom: 32px;
+    display: inline-block;
+  }
+  .snc-account-orders table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .snc-account-orders th {
+    text-align: left;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 8px 12px;
+    color: #333;
+  }
+  .snc-account-orders td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .snc-account-orders a {
+    color: {{ section.settings.main_color | default: '#000000' }};
+    text-decoration: underline;
+  }
+  .snc-account-details p {
+    font-size: 14px;
+    color: #444;
+    margin: 4px 0;
+  }
+  .snc-account-address-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 14px;
+    color: {{ section.settings.main_color | default: '#000000' }};
+    text-decoration: underline;
+  }
+</style>
+
+<div class="snc-account-{{ section.id }}">
+
+  <h1>{{ section.settings.title | default: 'Mi cuenta' }}</h1>
+  <a href="{{ routes.account_logout_url }}" class="snc-account-logout">{{ section.settings.log_out_text | default: 'Cerrar sesión' }}</a>
+
+  <h2>{{ section.settings.orders_title | default: 'Historial de pedidos' }}</h2>
+  {%- if customer.orders.size > 0 -%}
+    <div class="snc-account-orders">
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Fecha</th>
+            <th>Estado de pago</th>
+            <th>Estado de envío</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for order in customer.orders -%}
+            <tr>
+              <td><a href="{{ order.customer_url }}">{{ order.name }}</a></td>
+              <td>{{ order.created_at | date: '%d/%m/%Y' }}</td>
+              <td>{{ order.financial_status_label }}</td>
+              <td>{{ order.fulfillment_status_label }}</td>
+              <td>{{ order.total_price | money }}</td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+  {%- else -%}
+    <p>{{ section.settings.no_orders_text | default: 'No has realizado pedidos aún.' }}</p>
+  {%- endif -%}
+
+  <h2>{{ section.settings.account_details_title | default: 'Detalles de la cuenta' }}</h2>
+  <div class="snc-account-details">
+    <p>{{ customer.name }}</p>
+    <p>{{ customer.email }}</p>
+    {%- if customer.default_address -%}
+      <p>{{ customer.default_address.summary }}</p>
+    {%- endif -%}
+  </div>
+
+  <a href="{{ routes.account_addresses_url }}" class="snc-account-address-link">
+    {{ section.settings.view_addresses_text | default: 'Ver direcciones' }}
+  </a>
+
+</div>
+
+{% schema %}
+{
+  "name": "Mi cuenta",
+  "tag": "section",
+  "settings": [
+    { "type": "color", "id": "main_color", "label": "Color principal", "default": "#000000" },
+    { "type": "text", "id": "title", "label": "Título", "default": "Mi cuenta" },
+    { "type": "text", "id": "log_out_text", "label": "Texto: Cerrar sesión", "default": "Cerrar sesión" },
+    { "type": "text", "id": "orders_title", "label": "Título historial de pedidos", "default": "Historial de pedidos" },
+    { "type": "text", "id": "no_orders_text", "label": "Texto sin pedidos", "default": "No has realizado pedidos aún." },
+    { "type": "text", "id": "account_details_title", "label": "Título detalles cuenta", "default": "Detalles de la cuenta" },
+    { "type": "text", "id": "view_addresses_text", "label": "Texto: Ver direcciones", "default": "Ver direcciones" },
+    { "type": "range", "id": "margin_top", "label": "Margen superior", "min": 0, "max": 300, "step": 10, "default": 170 },
+    { "type": "range", "id": "margin_bottom", "label": "Margen inferior", "min": 0, "max": 200, "step": 10, "default": 80 }
+  ],
+  "presets": [{ "name": "Mi cuenta" }]
+}
+{% endschema %}

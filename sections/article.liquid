@@ -1,0 +1,724 @@
+{% comment %}
+  Article - Plantilla moderna y minimalista para artículos de blog
+{% endcomment %}
+
+<style>
+  /* Reset styles for article content */
+  .article-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#ffffff' }};
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .article-section-{{ section.id }} * {
+    box-sizing: border-box;
+  }
+
+  /* Hero Image */
+  .article-hero {
+    width: 100%;
+    height: {{ section.settings.hero_height | default: 500 }}px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .article-hero {
+      height: {{ section.settings.hero_height | default: 500 | times: 0.6 }}px;
+    }
+  }
+
+  .article-hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+  }
+
+  /* Content Container */
+  .article-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .article-container {
+      padding: 40px 24px;
+    }
+  }
+
+  /* Meta Info */
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: {{ section.settings.meta_color | default: '#999999' }};
+  }
+
+  .article-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .article-meta svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .article-tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background-color: {{ section.settings.tag_bg | default: '#f5f5f5' }};
+    color: {{ section.settings.tag_color | default: '#666666' }};
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 20px;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: background-color 0.2s ease;
+  }
+
+  .article-tag:hover {
+    background-color: {{ section.settings.tag_hover_bg | default: '#e8e8e8' }};
+  }
+
+  /* Title */
+  .article-title {
+    font-size: {{ section.settings.title_size | default: 42 }}px;
+    font-weight: {{ section.settings.title_weight | default: 700 }};
+    line-height: 1.2;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    margin: 0 0 20px;
+  }
+
+  @media (max-width: 768px) {
+    .article-title {
+      font-size: {{ section.settings.title_size | default: 42 | times: 0.7 }}px;
+    }
+  }
+
+  /* Excerpt */
+  .article-excerpt {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: {{ section.settings.excerpt_color | default: '#666666' }};
+    margin-bottom: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid {{ section.settings.divider_color | default: '#e0e0e0' }};
+  }
+
+  /* Content - Rich Text Editor Styles */
+  .article-content,
+  .article-content.rte {
+    font-size: {{ section.settings.content_size | default: 18 }}px;
+    line-height: 1.9;
+    color: {{ section.settings.content_color | default: '#333333' }};
+    font-family: inherit;
+  }
+
+  .article-content > * {
+    margin-bottom: 24px;
+  }
+
+  .article-content > *:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Headings with clear hierarchy */
+  .article-content h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 48px 0 24px;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .article-content h2 {
+    font-size: 30px;
+    font-weight: 600;
+    margin: 42px 0 20px;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .article-content h3 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 36px 0 16px;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.3;
+  }
+
+  .article-content h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 32px 0 14px;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.4;
+  }
+
+  .article-content h5 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 28px 0 12px;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.4;
+  }
+
+  .article-content h6 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 24px 0 10px;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Paragraphs with good spacing */
+  .article-content p {
+    margin-bottom: 24px;
+    font-size: inherit;
+    line-height: 1.9;
+  }
+
+  .article-content p + p {
+    margin-top: 24px;
+  }
+
+  /* Images */
+  .article-content img,
+  .article-content .rte__img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 40px 0;
+    display: block;
+  }
+
+  /* Blockquotes */
+  .article-content blockquote,
+  .article-content .rte__blockquote {
+    border-left: 4px solid {{ section.settings.accent_color | default: '#1a1a1a' }};
+    padding: 16px 0 16px 28px;
+    margin: 40px 0;
+    font-style: italic;
+    color: {{ section.settings.excerpt_color | default: '#666666' }};
+    font-size: inherit;
+    background: transparent;
+    line-height: 1.8;
+  }
+
+  .article-content blockquote p {
+    margin: 0;
+  }
+
+  /* Lists */
+  .article-content ul,
+  .article-content ol,
+  .article-content .rte__list {
+    margin: 24px 0;
+    padding-left: 32px;
+    font-size: inherit;
+  }
+
+  .article-content ul {
+    list-style-type: disc;
+  }
+
+  .article-content ol {
+    list-style-type: decimal;
+  }
+
+  .article-content li {
+    margin-bottom: 12px;
+    font-size: inherit;
+    line-height: 1.7;
+  }
+
+  .article-content li:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Links */
+  .article-content a,
+  .article-content .rte__link {
+    color: {{ section.settings.accent_color | default: '#1a1a1a' }};
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-size: inherit;
+  }
+
+  .article-content a:hover {
+    opacity: 0.7;
+  }
+
+  /* Text formatting */
+  .article-content strong,
+  .article-content b {
+    font-weight: 700;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+  }
+
+  .article-content em,
+  .article-content i {
+    font-style: italic;
+  }
+
+  .article-content code {
+    background: #f5f5f5;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+
+  .article-content pre {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 24px 0;
+    font-family: monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+  }
+
+  /* Share */
+  .article-share {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid {{ section.settings.divider_color | default: '#e0e0e0' }};
+  }
+
+  .article-share-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: {{ section.settings.meta_color | default: '#999999' }};
+    margin-bottom: 16px;
+  }
+
+  .article-share-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .article-share-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: {{ section.settings.share_bg | default: '#f5f5f5' }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .article-share-btn:hover {
+    background-color: {{ section.settings.share_hover_bg | default: '#1a1a1a' }};
+  }
+
+  .article-share-btn:hover svg {
+    stroke: #ffffff;
+  }
+
+  .article-share-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: {{ section.settings.share_icon_color | default: '#333333' }};
+    fill: none;
+    transition: stroke 0.2s ease;
+  }
+
+  /* Navigation */
+  .article-nav {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid {{ section.settings.divider_color | default: '#e0e0e0' }};
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 600px) {
+    .article-nav {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+
+  .article-nav-item {
+    text-decoration: none;
+  }
+
+  .article-nav-item.next {
+    text-align: right;
+  }
+
+  @media (max-width: 600px) {
+    .article-nav-item.next {
+      text-align: left;
+    }
+  }
+
+  .article-nav-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: {{ section.settings.meta_color | default: '#999999' }};
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .article-nav-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    line-height: 1.4;
+    transition: opacity 0.2s ease;
+  }
+
+  .article-nav-item:hover .article-nav-title {
+    opacity: 0.7;
+  }
+
+  /* Back to blog */
+  .article-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ section.settings.meta_color | default: '#666666' }};
+    text-decoration: none;
+    transition: gap 0.2s ease;
+  }
+
+  .article-back:hover {
+    gap: 12px;
+  }
+
+  .article-back svg {
+    width: 16px;
+    height: 16px;
+  }
+</style>
+
+<div class="article-section-{{ section.id }}">
+  
+  {% comment %} Hero Image {% endcomment %}
+  {% if article.image != blank %}
+    <div class="article-hero">
+      {{ article.image | image_url: width: 2000 | image_tag: 
+        class: 'article-hero-image',
+        loading: 'eager',
+        alt: article.title
+      }}
+      <div class="article-hero-overlay"></div>
+    </div>
+  {% endif %}
+
+  <div class="article-container">
+    
+    {% comment %} Tag {% endcomment %}
+    {% if article.tags.size > 0 %}
+      <a href="{{ blog.url }}/tagged/{{ article.tags.first | handle }}" class="article-tag">
+        {{ article.tags.first }}
+      </a>
+    {% endif %}
+
+    {% comment %} Meta {% endcomment %}
+    <div class="article-meta">
+      <span class="article-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        {{ article.published_at | date: '%d de %B de %Y' }}
+      </span>
+      {% if article.author != blank %}
+        <span class="article-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          {{ article.author }}
+        </span>
+      {% endif %}
+    </div>
+
+    {% comment %} Title {% endcomment %}
+    <h1 class="article-title">{{ article.title }}</h1>
+
+    {% comment %} Excerpt {% endcomment %}
+    {% if article.excerpt != blank %}
+      <div class="article-excerpt">
+        {{ article.excerpt }}
+      </div>
+    {% endif %}
+
+    {% comment %} Content {% endcomment %}
+    <div class="article-content rte">
+      {{ article.content }}
+    </div>
+
+    {% comment %} Share {% endcomment %}
+    {% if section.settings.show_share %}
+      <div class="article-share">
+        <span class="article-share-title">Compartir</span>
+        <div class="article-share-buttons">
+          <a href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: article.url | url_encode }}" 
+             target="_blank" 
+             rel="noopener" 
+             class="article-share-btn"
+             aria-label="Compartir en Facebook">
+            <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          </a>
+          <a href="https://twitter.com/intent/tweet?text={{ article.title | url_encode }}&url={{ shop.url | append: article.url | url_encode }}" 
+             target="_blank" 
+             rel="noopener" 
+             class="article-share-btn"
+             aria-label="Compartir en Twitter">
+            <svg viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+          </a>
+          <a href="https://pinterest.com/pin/create/button/?url={{ shop.url | append: article.url | url_encode }}&media={{ article.image | image_url: width: 800 }}&description={{ article.title | url_encode }}" 
+             target="_blank" 
+             rel="noopener" 
+             class="article-share-btn"
+             aria-label="Compartir en Pinterest">
+            <svg viewBox="0 0 24 24"><path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0"></path><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="M4.93 4.93l1.41 1.41"></path><path d="M17.66 17.66l1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="M6.34 17.66l-1.41 1.41"></path><path d="M19.07 4.93l-1.41 1.41"></path></svg>
+          </a>
+          <button class="article-share-btn" 
+                  onclick="navigator.clipboard.writeText(window.location.href); this.style.backgroundColor='{{ section.settings.accent_color | default: '#1a1a1a' }}'; this.querySelector('svg').style.stroke='white'; setTimeout(() => { this.style.backgroundColor=''; this.querySelector('svg').style.stroke=''; }, 1000);"
+                  aria-label="Copiar enlace">
+            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          </button>
+        </div>
+      </div>
+    {% endif %}
+
+    {% comment %} Navigation {% endcomment %}
+    {% if section.settings.show_nav %}
+      <div class="article-nav">
+        {% if blog.previous_article %}
+          <a href="{{ blog.previous_article.url }}" class="article-nav-item prev">
+            <span class="article-nav-label">← Artículo anterior</span>
+            <span class="article-nav-title">{{ blog.previous_article.title }}</span>
+          </a>
+        {% endif %}
+        {% if blog.next_article %}
+          <a href="{{ blog.next_article.url }}" class="article-nav-item next">
+            <span class="article-nav-label">Artículo siguiente →</span>
+            <span class="article-nav-title">{{ blog.next_article.title }}</span>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% comment %} Back to blog {% endcomment %}
+    <a href="{{ blog.url }}" class="article-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Volver al blog
+    </a>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Artículo de Blog",
+  "tag": "section",
+  "class": "section-article",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "⚠️ Esta sección es DINÁMICA. Muestra automáticamente el artículo actual. Funciona en páginas de artículo de blog (/blogs/nombre-blog/articulo)."
+    },
+    {
+      "type": "header",
+      "content": "🖼️ Imagen Destacada"
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "label": "Altura de la imagen",
+      "min": 300,
+      "max": 700,
+      "step": 50,
+      "unit": "px",
+      "default": 500
+    },
+    {
+      "type": "header",
+      "content": "📝 Tipografía"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "min": 28,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "content_size",
+      "label": "Tamaño del contenido",
+      "min": 14,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colores"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "content_color",
+      "label": "Color del contenido",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "excerpt_color",
+      "label": "Color del extracto",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "meta_color",
+      "label": "Color de metadatos",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Color de acento",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Color de separadores",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "header",
+      "content": "🏷️ Etiquetas"
+    },
+    {
+      "type": "color",
+      "id": "tag_bg",
+      "label": "Fondo de etiqueta",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "tag_hover_bg",
+      "label": "Fondo hover",
+      "default": "#e8e8e8"
+    },
+    {
+      "type": "color",
+      "id": "tag_color",
+      "label": "Color de texto",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "📤 Compartir"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share",
+      "label": "Mostrar botones de compartir",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "share_bg",
+      "label": "Fondo de botones",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "share_hover_bg",
+      "label": "Fondo hover",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "share_icon_color",
+      "label": "Color de iconos",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "🔗 Navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_nav",
+      "label": "Mostrar artículos anterior/siguiente",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Artículo de Blog"
+    }
+  ]
+}
+{% endschema %}

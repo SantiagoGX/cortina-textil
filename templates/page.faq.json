@@ -1,0 +1,90 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "faq_gaPiEa": {
+      "type": "faq",
+      "blocks": {
+        "question_8BaGkr": {
+          "type": "question",
+          "settings": {
+            "question": "Lorem ipsum dolor sit amet consectetur?",
+            "answer": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+            "open_by_default": false
+          }
+        },
+        "question_3HGAYd": {
+          "type": "question",
+          "settings": {
+            "question": "Lorem ipsum dolor sit amet consectetur?",
+            "answer": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+            "open_by_default": false
+          }
+        },
+        "question_mzER4U": {
+          "type": "question",
+          "settings": {
+            "question": "Lorem ipsum dolor sit amet consectetur?",
+            "answer": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+            "open_by_default": false
+          }
+        },
+        "question_YfyLcw": {
+          "type": "question",
+          "settings": {
+            "question": "Lorem ipsum dolor sit amet consectetur?",
+            "answer": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+            "open_by_default": false
+          }
+        },
+        "question_zxtgqM": {
+          "type": "question",
+          "settings": {
+            "question": "Lorem ipsum dolor sit amet consectetur?",
+            "answer": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+            "open_by_default": false
+          }
+        },
+        "question_zjeFeT": {
+          "type": "question",
+          "settings": {
+            "question": "Lorem ipsum dolor sit amet consectetur?",
+            "answer": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>",
+            "open_by_default": false
+          }
+        }
+      },
+      "block_order": [
+        "question_8BaGkr",
+        "question_3HGAYd",
+        "question_mzER4U",
+        "question_YfyLcw",
+        "question_zxtgqM",
+        "question_zjeFeT"
+      ],
+      "name": "Preguntas Frecuentes",
+      "settings": {
+        "title": "Preguntas Frecuentes",
+        "subtitle": "<p>Lorem ipsum dolor sit amet consectetur. Luctus morbi et magna semper pretium. Mauris in turpis.</p>",
+        "title_size": 32,
+        "max_width": 800,
+        "background_color": "#f5f5f5",
+        "text_color": "#1a1a1a",
+        "item_background": "#ffffff",
+        "item_border_color": "#e5e5e5",
+        "color_scheme": "background-1",
+        "accordion_mode": false
+      }
+    }
+  },
+  "order": [
+    "faq_gaPiEa"
+  ]
+}

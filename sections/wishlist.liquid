@@ -1,0 +1,734 @@
+{% comment %}
+  Wishlist/Favoritos - Página de productos favoritos
+  Funciona con localStorage para persistencia
+{% endcomment %}
+
+<style>
+  .wishlist-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color | default: '#ffffff' }};
+    padding: 60px 0 100px;
+    min-height: 60vh;
+  }
+
+  .wishlist-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .wishlist-header {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid {{ section.settings.border_color | default: '#e5e5e5' }};
+  }
+
+  .wishlist-title {
+    font-size: {{ section.settings.title_size | default: 32 }}px;
+    font-weight: {{ section.settings.title_weight | default: 600 }};
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    margin: 0 0 12px;
+  }
+
+  .wishlist-page-count {
+    font-size: 16px;
+    color: {{ section.settings.meta_color | default: '#666666' }};
+  }
+
+  /* Empty State */
+  .wishlist-empty {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .wishlist-empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    color: {{ section.settings.border_color | default: '#cccccc' }};
+  }
+
+  .wishlist-empty-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    margin: 0 0 12px;
+  }
+
+  .wishlist-empty-text {
+    font-size: 16px;
+    color: {{ section.settings.meta_color | default: '#666666' }};
+    margin: 0 0 32px;
+  }
+
+  .wishlist-continue-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 32px;
+    background-color: {{ section.settings.button_bg | default: '#1a1a1a' }};
+    color: {{ section.settings.button_color | default: '#ffffff' }};
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: {{ section.settings.button_radius | default: 8 }}px;
+    transition: opacity 0.2s ease;
+  }
+
+  .wishlist-continue-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* Grid - Mismo estilo que PLP */
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.columns | default: 4 }}, 1fr);
+    gap: {{ section.settings.grid_gap | default: 24 }}px;
+  }
+
+  @media (max-width: 1024px) {
+    .wishlist-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .wishlist-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+  }
+
+  /* Product Card */
+  .wishlist-card {
+    position: relative;
+  }
+
+  .wishlist-card-image-wrapper {
+    position: relative;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    border-radius: {{ section.settings.card_radius | default: 8 }}px;
+    background-color: {{ section.settings.image_bg | default: '#f5f5f5' }};
+  }
+
+  .wishlist-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .wishlist-card:hover .wishlist-card-image {
+    transform: scale(1.05);
+  }
+
+  /* Remove Button (reemplaza el corazón en favoritos) */
+  .wishlist-remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: {{ section.settings.remove_bg | default: '#ffffff' }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    z-index: 2;
+  }
+
+  .wishlist-remove-btn:hover {
+    background-color: {{ section.settings.remove_hover_bg | default: '#e74c3c' }};
+    transform: scale(1.1);
+  }
+
+  .wishlist-remove-btn:hover svg {
+    stroke: #ffffff;
+  }
+
+  .wishlist-remove-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: {{ section.settings.remove_color | default: '#e74c3c' }};
+    fill: none;
+    transition: stroke 0.2s ease;
+  }
+
+  /* Quick Add Button */
+  .wishlist-quick-add {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 12px;
+    background-color: {{ section.settings.button_bg | default: '#1a1a1a' }};
+    color: {{ section.settings.button_color | default: '#ffffff' }};
+    border: none;
+    border-radius: {{ section.settings.button_radius | default: 6 }}px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+  }
+
+  .wishlist-card:hover .wishlist-quick-add {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .wishlist-quick-add:hover {
+    opacity: 0.9;
+  }
+
+  /* Card Info */
+  .wishlist-card-info {
+    padding: 12px 4px;
+  }
+
+  .wishlist-card-title {
+    font-size: {{ section.settings.card_title_size | default: 14 }}px;
+    font-weight: {{ section.settings.card_title_weight | default: 500 }};
+    color: {{ section.settings.card_title_color | default: '#1a1a1a' }};
+    margin: 0 0 6px;
+    line-height: 1.4;
+  }
+
+  .wishlist-card-price {
+    font-size: {{ section.settings.price_size | default: 14 }}px;
+    color: {{ section.settings.price_color | default: '#1a1a1a' }};
+    margin: 0;
+  }
+
+  .wishlist-card-price .compare {
+    text-decoration: line-through;
+    color: {{ section.settings.compare_price_color | default: '#999999' }};
+    margin-left: 8px;
+  }
+
+  /* Loading State */
+  .wishlist-loading {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .wishlist-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid {{ section.settings.border_color | default: '#e5e5e5' }};
+    border-top-color: {{ section.settings.accent_color | default: '#1a1a1a' }};
+    border-radius: 50%;
+    animation: wishlist-spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes wishlist-spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<div class="wishlist-section-{{ section.id }}" data-wishlist-section>
+  <div class="wishlist-container">
+    
+    <div class="wishlist-header">
+      <h1 class="wishlist-title">{{ section.settings.title | default: 'Mis Favoritos' }}</h1>
+      <span class="wishlist-page-count" data-wishlist-count>0 productos</span>
+    </div>
+
+    <div class="wishlist-loading" data-wishlist-loading>
+      <div class="wishlist-loading-spinner"></div>
+      <p>Cargando favoritos...</p>
+    </div>
+
+    <div class="wishlist-grid" data-wishlist-grid style="display: none;">
+      <!-- Los productos se cargan dinámicamente con JavaScript -->
+    </div>
+
+    <div class="wishlist-empty" data-wishlist-empty style="display: none;">
+      <svg class="wishlist-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <h2 class="wishlist-empty-title">{{ section.settings.empty_title | default: 'No tienes favoritos' }}</h2>
+      <p class="wishlist-empty-text">{{ section.settings.empty_text | default: 'Explora nuestros productos y guarda tus favoritos.' }}</p>
+      <a href="{{ routes.all_products_collection_url }}" class="wishlist-continue-btn">
+        {{ section.settings.empty_button | default: 'Explorar productos' }}
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Limpiar datos antiguos (IDs numéricos) del localStorage
+    (function cleanupOldWishlistData() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        const validItems = wishlist.filter(item => typeof item === 'string' && !/^\d+$/.test(item));
+        if (validItems.length !== wishlist.length) {
+          localStorage.setItem('wishlist', JSON.stringify(validItems));
+          console.log('[Wishlist] Datos antiguos limpiados:', wishlist.length - validItems.length, 'items removidos');
+        }
+      } catch (e) {}
+    })();
+
+    // Función para obtener wishlist del localStorage
+    function getWishlist() {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        // Filtrar solo handles válidos (strings, no IDs numéricos antiguos)
+        return wishlist.filter(item => typeof item === 'string' && !/^\d+$/.test(item));
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // Función para guardar wishlist
+    function saveWishlist(wishlist) {
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      // Disparar evento para sincronizar con otras páginas
+      window.dispatchEvent(new CustomEvent('wishlist:updated', { 
+        detail: { count: wishlist.length, wishlist: wishlist }
+      }));
+    }
+
+    // Función para remover producto del wishlist
+    function removeFromWishlist(productHandle) {
+      const wishlist = getWishlist();
+      const newWishlist = wishlist.filter(handle => handle !== productHandle);
+      saveWishlist(newWishlist);
+      return newWishlist;
+    }
+
+    // Función para cargar productos de Shopify
+    async function loadWishlistProducts() {
+      const wishlist = getWishlist();
+      const grid = document.querySelector('[data-wishlist-grid]');
+      const loading = document.querySelector('[data-wishlist-loading]');
+      const empty = document.querySelector('[data-wishlist-empty]');
+      const countEl = document.querySelector('[data-wishlist-count]');
+
+      // Actualizar contador
+      if (countEl) {
+        countEl.textContent = wishlist.length === 1 
+          ? '1 producto' 
+          : `${wishlist.length} productos`;
+      }
+
+      if (wishlist.length === 0) {
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+        grid.style.display = 'none';
+        return;
+      }
+
+      try {
+        // Cargar productos usando la API de Shopify
+        const products = [];
+        
+        for (const productId of wishlist) {
+          try {
+            // Intentar obtener el producto por handle
+            const response = await fetch(`/products/${productId}.js`);
+            if (response.ok) {
+              const product = await response.json();
+              products.push(product);
+            }
+          } catch (e) {
+            console.log('Error cargando producto:', productId);
+          }
+        }
+
+        if (products.length === 0) {
+          loading.style.display = 'none';
+          empty.style.display = 'block';
+          return;
+        }
+
+        // Renderizar productos
+        grid.innerHTML = products.map(product => `
+          <div class="wishlist-card" data-product-handle="${product.handle}">
+            <a href="${product.url}">
+              <div class="wishlist-card-image-wrapper">
+                <img 
+                  src="${product.featured_image}" 
+                  alt="${product.title}"
+                  class="wishlist-card-image"
+                  loading="lazy"
+                >
+              </div>
+            </a>
+            
+            <button 
+              type="button" 
+              class="wishlist-remove-btn" 
+              data-remove-wishlist 
+              data-product-handle="${product.handle}"
+              aria-label="Eliminar de favoritos"
+            >
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <button 
+              type="button" 
+              class="wishlist-quick-add"
+              data-quick-add
+              data-product-handle="${product.handle}"
+              data-variant-id="${product.variants[0]?.id || ''}"
+            >
+              Agregar al carrito
+            </button>
+
+            <div class="wishlist-card-info">
+              <h3 class="wishlist-card-title">${product.title}</h3>
+              <p class="wishlist-card-price">
+                ${product.compare_at_price > product.price 
+                  ? `<span class="sale">${formatMoney(product.price)}</span> <span class="compare">${formatMoney(product.compare_at_price)}</span>`
+                  : formatMoney(product.price)
+                }
+              </p>
+            </div>
+          </div>
+        `).join('');
+
+        loading.style.display = 'none';
+        grid.style.display = 'grid';
+
+        // Agregar event listeners a los botones de remover
+        grid.querySelectorAll('[data-remove-wishlist]').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const productHandle = this.dataset.productHandle;
+            const card = this.closest('.wishlist-card');
+            
+            // Animación de salida
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+              removeFromWishlist(productHandle);
+              card.remove();
+              
+              // Recargar si no quedan productos
+              const remaining = getWishlist();
+              if (remaining.length === 0) {
+                grid.style.display = 'none';
+                empty.style.display = 'block';
+              }
+              
+              // Actualizar contador
+              if (countEl) {
+                countEl.textContent = remaining.length === 1 
+                  ? '1 producto' 
+                  : `${remaining.length} productos`;
+              }
+            }, 300);
+          });
+        });
+
+        // Agregar event listeners a los botones de quick add
+        grid.querySelectorAll('[data-quick-add]').forEach(btn => {
+          btn.addEventListener('click', async function() {
+            const variantId = this.dataset.variantId;
+            if (!variantId) return;
+
+            this.textContent = 'Agregando...';
+            
+            try {
+              const formData = new FormData();
+              formData.append('id', variantId);
+              formData.append('quantity', '1');
+              
+              await fetch('/cart/add.js', {
+                method: 'POST',
+                body: formData
+              });
+              
+              this.textContent = '¡Agregado!';
+              setTimeout(() => {
+                this.textContent = 'Agregar al carrito';
+              }, 2000);
+              
+              // Actualizar contador del carrito
+              updateCartCounter();
+            } catch (error) {
+              this.textContent = 'Error';
+              setTimeout(() => {
+                this.textContent = 'Agregar al carrito';
+              }, 2000);
+            }
+          });
+        });
+
+      } catch (error) {
+        console.error('Error cargando wishlist:', error);
+        loading.style.display = 'none';
+        empty.style.display = 'block';
+      }
+    }
+
+    // Helper para formatear precios
+    function formatMoney(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+
+    // Función para actualizar contador del carrito
+    async function updateCartCounter() {
+      try {
+        const response = await fetch('/cart.js?v=' + Date.now());
+        const cart = await response.json();
+        
+        document.querySelectorAll('.cart-count').forEach(counter => {
+          counter.textContent = cart.item_count;
+          if (cart.item_count > 0) {
+            counter.style.display = 'flex';
+          }
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Cargar productos al iniciar
+    loadWishlistProducts();
+
+    // Escuchar cambios del wishlist desde otras páginas
+    window.addEventListener('wishlist:updated', function() {
+      loadWishlistProducts();
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Lista de Favoritos",
+  "tag": "section",
+  "class": "section-wishlist",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Mis Favoritos"
+    },
+    {
+      "type": "text",
+      "id": "empty_title",
+      "label": "Título cuando está vacío",
+      "default": "No tienes favoritos"
+    },
+    {
+      "type": "textarea",
+      "id": "empty_text",
+      "label": "Mensaje cuando está vacío",
+      "default": "Explora nuestros productos y guarda tus favoritos."
+    },
+    {
+      "type": "text",
+      "id": "empty_button",
+      "label": "Texto del botón",
+      "default": "Explorar productos"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colores"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fondo de la sección",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "meta_color",
+      "label": "Color de metadatos",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Color del nombre del producto",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Color del precio",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "compare_price_color",
+      "label": "Color precio tachado",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Color de bordes",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fondo del botón",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del botón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "remove_bg",
+      "label": "Fondo botón eliminar",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "remove_hover_bg",
+      "label": "Fondo hover eliminar",
+      "default": "#e74c3c"
+    },
+    {
+      "type": "color",
+      "id": "remove_color",
+      "label": "Color icono eliminar",
+      "default": "#e74c3c"
+    },
+    {
+      "type": "color",
+      "id": "image_bg",
+      "label": "Fondo de imágenes",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columnas (desktop)",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Espacio entre tarjetas",
+      "min": 16,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción de imagen",
+      "options": [
+        { "value": "1/1", "label": "Cuadrado (1:1)" },
+        { "value": "3/4", "label": "Vertical (3:4)" },
+        { "value": "4/3", "label": "Horizontal (4:3)" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Redondeo de tarjetas",
+      "min": 0,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Redondeo de botones",
+      "min": 0,
+      "max": 12,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "min": 24,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Tamaño del nombre del producto",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "card_title_weight",
+      "label": "Grosor del nombre",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "label": "Tamaño del precio",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    }
+  ],
+  "presets": [
+    {
+      "name": "Lista de Favoritos"
+    }
+  ]
+}
+{% endschema %}

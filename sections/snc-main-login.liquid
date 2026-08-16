@@ -1,0 +1,102 @@
+{% comment %}
+  snc-main-login — Formulario de inicio de sesión
+{% endcomment %}
+
+<style>
+  .snc-login-{{ section.id }} {
+    margin-top: {{ section.settings.margin_top | default: 100 }}px;
+    margin-bottom: {{ section.settings.margin_bottom | default: 60 }}px;
+    padding: 0 20px;
+  }
+  .snc-login-inner-{{ section.id }} {
+    max-width: {{ section.settings.max_width | default: 390 }}px;
+    margin: 0 auto;
+  }
+  .snc-login-{{ section.id }} h1 {
+    color: {{ section.settings.title_color | default: '#000000' }};
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .snc-login-{{ section.id }} .field {
+    margin-bottom: 16px;
+  }
+  .snc-login-{{ section.id }} label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+  }
+  .snc-login-{{ section.id }} input[type="email"],
+  .snc-login-{{ section.id }} input[type="password"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .snc-login-{{ section.id }} .btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: {{ section.settings.btn_bg_color | default: '#000000' }};
+    color: {{ section.settings.btn_text_color | default: '#ffffff' }};
+    font-size: {{ section.settings.btn_font_size | default: 16 }}px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .snc-login-{{ section.id }} .login-links {
+    margin-top: 16px;
+    text-align: center;
+  }
+  .snc-login-{{ section.id }} .login-links a {
+    color: {{ section.settings.links_color | default: '#000000' }};
+    font-size: {{ section.settings.links_font_size | default: 14 }}px;
+    text-decoration: underline;
+    display: block;
+    margin-bottom: 8px;
+  }
+</style>
+
+<div class="snc-login-{{ section.id }}">
+  <div class="snc-login-inner-{{ section.id }}">
+    <h1>Iniciar sesión</h1>
+    {%- form 'customer_login' -%}
+      {{ form.errors | default_errors }}
+      <div class="field">
+        <label for="CustomerEmail">Correo electrónico</label>
+        <input type="email" name="customer[email]" id="CustomerEmail" autocomplete="email" autocorrect="off" autocapitalize="off" value="{{ form.email }}" required>
+      </div>
+      <div class="field">
+        <label for="CustomerPassword">Contraseña</label>
+        <input type="password" name="customer[password]" id="CustomerPassword" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-submit">Iniciar sesión</button>
+    {%- endform -%}
+    <div class="login-links">
+      <a href="{{ routes.account_recover_url }}">¿Olvidaste tu contraseña?</a>
+      <a href="{{ routes.account_register_url }}">Crear cuenta nueva</a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Login",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "margin_top", "label": "Margen superior", "min": 0, "max": 300, "step": 10, "default": 100 },
+    { "type": "range", "id": "margin_bottom", "label": "Margen inferior", "min": 0, "max": 200, "step": 10, "default": 60 },
+    { "type": "number", "id": "max_width", "label": "Ancho máximo (px)", "default": 390 },
+    { "type": "color", "id": "title_color", "label": "Color título", "default": "#000000" },
+    { "type": "color", "id": "btn_bg_color", "label": "Fondo botón", "default": "#000000" },
+    { "type": "color", "id": "btn_text_color", "label": "Texto botón", "default": "#ffffff" },
+    { "type": "range", "id": "btn_font_size", "label": "Tamaño fuente botón", "min": 12, "max": 24, "step": 1, "default": 16 },
+    { "type": "color", "id": "links_color", "label": "Color enlaces", "default": "#000000" },
+    { "type": "range", "id": "links_font_size", "label": "Tamaño fuente enlaces", "min": 10, "max": 20, "step": 1, "default": 14 }
+  ],
+  "presets": [{ "name": "Login" }]
+}
+{% endschema %}

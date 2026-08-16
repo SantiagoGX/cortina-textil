@@ -1,0 +1,128 @@
+{% comment %}
+  snc-info-hero — Hero con imagen de fondo, overlay y texto
+{% endcomment %}
+
+<style>
+  .snc-info-hero-{{ section.id }} {
+    position: relative;
+    width: {% if section.settings.full_width %}100%{% else %}calc(100% - 40px); margin: 0 20px;{% endif %};
+    height: {{ section.settings.height_vh | default: 50 }}vh;
+    margin-top: {{ section.settings.margin_top | default: 0 }}px;
+    border-radius: {{ section.settings.border_radius | default: 0 }}px;
+    overflow: hidden;
+    display: flex;
+    align-items: {{ section.settings.content_vertical_position | default: 'flex-end' }};
+    justify-content: {{ section.settings.content_horizontal_position | default: 'flex-start' }};
+  }
+  .snc-info-hero-bg-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+  .snc-info-hero-overlay-{{ section.id }} {
+    position: absolute;
+    inset: 0;
+    {% if section.settings.overlay_type == 'gradient' %}
+      background: linear-gradient({{ section.settings.gradient_direction | default: 'to top' }}, {{ section.settings.overlay_color | default: '#000000' }}{{ section.settings.overlay_opacity | default: 100 | divided_by: 100.0 | times: 255 | round | prepend: '%0' | last: 2 }}, transparent);
+    {% else %}
+      background-color: {{ section.settings.overlay_color | default: '#000000' }};
+      opacity: {{ section.settings.overlay_opacity | default: 40 | divided_by: 100.0 }};
+    {% endif %}
+  }
+  .snc-info-hero-content-{{ section.id }} {
+    position: relative;
+    z-index: 1;
+    padding: 40px;
+    text-align: {{ section.settings.text_alignment | default: 'left' }};
+    color: #ffffff;
+  }
+  .snc-info-hero-content-{{ section.id }} h1 {
+    font-size: clamp(24px, 4vw, 56px);
+    font-weight: 700;
+    margin: 0 0 12px;
+    line-height: 1.1;
+  }
+  .snc-info-hero-content-{{ section.id }} p {
+    font-size: 18px;
+    margin: 0 0 20px;
+    opacity: 0.9;
+  }
+  .snc-info-hero-btn-{{ section.id }} {
+    display: inline-block;
+    padding: 12px 28px;
+    background: #ffffff;
+    color: #000000;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 4px;
+  }
+</style>
+
+<div class="snc-info-hero-{{ section.id }}">
+  {%- if section.settings.image != blank -%}
+    <img
+      class="snc-info-hero-bg-{{ section.id }}"
+      src="{{ section.settings.image | image_url: width: 1600 }}"
+      alt=""
+      loading="lazy">
+  {%- endif -%}
+  <div class="snc-info-hero-overlay-{{ section.id }}"></div>
+  <div class="snc-info-hero-content-{{ section.id }}">
+    {%- if section.settings.title != blank -%}
+      <h1>{{ section.settings.title }}</h1>
+    {%- endif -%}
+    {%- if section.settings.subtitle != blank -%}
+      <p>{{ section.settings.subtitle }}</p>
+    {%- endif -%}
+    {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+      <a href="{{ section.settings.button_link }}" class="snc-info-hero-btn-{{ section.id }}">{{ section.settings.button_label }}</a>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Info Hero",
+  "tag": "section",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Imagen de fondo" },
+    { "type": "range", "id": "margin_top", "label": "Margen superior", "min": 0, "max": 200, "step": 5, "default": 0 },
+    { "type": "range", "id": "height_vh", "label": "Alto (vh)", "min": 20, "max": 100, "step": 5, "default": 50 },
+    { "type": "checkbox", "id": "full_width", "label": "Ancho completo", "default": true },
+    { "type": "range", "id": "border_radius", "label": "Radio de borde", "min": 0, "max": 40, "step": 2, "default": 0 },
+    { "type": "select", "id": "overlay_type", "label": "Tipo de overlay", "options": [
+      { "value": "gradient", "label": "Gradiente" },
+      { "value": "solid", "label": "Sólido" }
+    ], "default": "gradient" },
+    { "type": "select", "id": "gradient_direction", "label": "Dirección gradiente", "options": [
+      { "value": "to top", "label": "Abajo a arriba" },
+      { "value": "to bottom", "label": "Arriba a abajo" },
+      { "value": "to right", "label": "Izquierda a derecha" }
+    ], "default": "to top" },
+    { "type": "color", "id": "overlay_color", "label": "Color overlay", "default": "#000000" },
+    { "type": "range", "id": "overlay_opacity", "label": "Opacidad overlay (%)", "min": 0, "max": 100, "step": 5, "default": 40 },
+    { "type": "select", "id": "content_vertical_position", "label": "Posición vertical contenido", "options": [
+      { "value": "flex-start", "label": "Arriba" },
+      { "value": "center", "label": "Centro" },
+      { "value": "flex-end", "label": "Abajo" }
+    ], "default": "flex-end" },
+    { "type": "select", "id": "content_horizontal_position", "label": "Posición horizontal contenido", "options": [
+      { "value": "flex-start", "label": "Izquierda" },
+      { "value": "center", "label": "Centro" },
+      { "value": "flex-end", "label": "Derecha" }
+    ], "default": "flex-start" },
+    { "type": "select", "id": "text_alignment", "label": "Alineación texto", "options": [
+      { "value": "left", "label": "Izquierda" },
+      { "value": "center", "label": "Centro" },
+      { "value": "right", "label": "Derecha" }
+    ], "default": "left" },
+    { "type": "text", "id": "title", "label": "Título" },
+    { "type": "text", "id": "subtitle", "label": "Subtítulo" },
+    { "type": "text", "id": "button_label", "label": "Texto botón" },
+    { "type": "url", "id": "button_link", "label": "Enlace botón" }
+  ],
+  "presets": [{ "name": "Info Hero" }]
+}
+{% endschema %}

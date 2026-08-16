@@ -1,0 +1,571 @@
+{% comment %}
+  Carousel Section - SOLO PRODUCTOS INDIVIDUALES
+{% endcomment %}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .carousel-section {
+    position: relative;
+    width: 100%;
+    padding: 64px 0;
+    background-color: {{ section.settings.background_color | default: '#ffffff' }};
+  }
+  
+  .carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 1512px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  
+  .carousel-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .carousel-title {
+    color: {{ section.settings.title_color | default: '#1a1a1a' }};
+    font-size: {{ section.settings.title_size | default: 36 }}px;
+    font-weight: {{ section.settings.title_weight | default: 600 }};
+    margin-bottom: 16px;
+  }
+  
+  .carousel-subtitle {
+    color: {{ section.settings.subtitle_color | default: '#666666' }};
+    font-size: {{ section.settings.subtitle_size | default: 16 }}px;
+    font-weight: 500;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  
+  .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+  
+  .carousel-track {
+    display: flex;
+    gap: {{ section.settings.card_gap | default: 24 }}px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 10px 0;
+  }
+  
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .carousel-card {
+    flex: 0 0 calc({{ 100.0 | divided_by: section.settings.cards_per_view | default: 5 }}% - {{ section.settings.card_gap | default: 24 | times: section.settings.cards_per_view | default: 5 | minus: 1 | divided_by: section.settings.cards_per_view | default: 5 }}px);
+    min-width: {{ section.settings.card_min_width | default: 180 }}px;
+    scroll-snap-align: start;
+    text-decoration: none;
+  }
+  
+  .carousel-card-image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: {{ section.settings.image_ratio | default: '1/1' }};
+    border-radius: {{ section.settings.card_radius | default: 12 }}px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background-color: {{ section.settings.card_bg | default: '#f5f5f5' }};
+  }
+  
+  .carousel-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .carousel-card:hover .carousel-card-image img {
+    transform: scale(1.05);
+  }
+  
+  .carousel-card-title {
+    color: {{ section.settings.card_title_color | default: '#1a1a1a' }};
+    font-size: {{ section.settings.card_title_size | default: 14 }}px;
+    font-weight: {{ section.settings.card_title_weight | default: 600 }};
+    text-align: center;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  
+  .carousel-card-price {
+    color: {{ section.settings.card_price_color | default: '#666666' }};
+    font-size: {{ section.settings.card_price_size | default: 14 }}px;
+    font-weight: {{ section.settings.card_price_weight | default: 400 }};
+    text-align: center;
+  }
+  
+  .carousel-card-wishlist {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    z-index: 2;
+  }
+  
+  .carousel-card-wishlist:hover {
+    transform: scale(1.1);
+  }
+  
+  .carousel-card-wishlist svg {
+    width: 16px;
+    height: 16px;
+    stroke: #333333;
+    fill: none;
+  }
+  
+  .carousel-card-wishlist.active svg {
+    fill: #e74c3c;
+    stroke: #e74c3c;
+  }
+  
+  /* FLECHAS - ESTILOS ABSOLUTOS/FIJOS */
+  .carousel-arrow {
+    position: absolute;
+    top: 40%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .carousel-arrow:hover {
+    background: #f5f5f5;
+  }
+  
+  .carousel-arrow.prev {
+    left: 0;
+  }
+
+  .carousel-arrow.next {
+    right: 0;
+  }
+  
+  .carousel-arrow svg {
+    width: 20px;
+    height: 20px;
+    stroke: #1a1a1a;
+  }
+  
+  @media (max-width: 1200px) {
+    .carousel-card {
+      flex: 0 0 calc(25% - 18px);
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .carousel-card {
+      flex: 0 0 calc(33.333% - 16px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .carousel-section {
+      padding: 48px 0;
+    }
+    .carousel-container {
+      padding: 0 16px;
+    }
+    .carousel-card {
+      flex: 0 0 calc(50% - 12px);
+      min-width: 150px;
+    }
+    .carousel-arrow {
+      width: 36px;
+      height: 36px;
+    }
+    .carousel-arrow.prev {
+      left: 2px;
+    }
+    .carousel-arrow.next {
+      right: 2px;
+    }
+    .carousel-title {
+      font-size: {{ section.settings.title_size | default: 36 | times: 0.75 }}px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .carousel-card {
+      flex: 0 0 calc(50% - 8px);
+    }
+  }
+</style>
+
+<div class="carousel-section">
+  <div class="carousel-container">
+    
+    <div class="carousel-header">
+      {% if section.settings.title != blank %}
+        <h2 class="carousel-title">{{ section.settings.title }}</h2>
+      {% endif %}
+      {% if section.settings.subtitle != blank %}
+        <p class="carousel-subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="carousel-wrapper">
+      <button class="carousel-arrow prev" aria-label="Anterior">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      
+      <div class="carousel-track" id="carousel-track-{{ section.id }}">
+        {% for block in section.blocks %}
+          {% assign product = all_products[block.settings.product] %}
+          {% if product != blank %}
+            <a href="{{ product.url }}" class="carousel-card" data-product-id="{{ product.id }}" {{ block.shopify_attributes }}>
+              <div class="carousel-card-image">
+                {% if product.featured_image != blank %}
+                  <img 
+                    src="{{ product.featured_image | image_url: width: 400 }}" 
+                    alt="{{ product.title | escape }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                {% else %}
+                  {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {% endif %}
+                {% if section.settings.show_wishlist %}
+                  <button class="carousel-card-wishlist" data-product-id="{{ product.id }}" aria-label="Añadir a favoritos">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="1.5"/>
+                    </svg>
+                  </button>
+                {% endif %}
+              </div>
+              <div class="carousel-card-title">{{ product.title }}</div>
+              <div class="carousel-card-price">
+                {% if product.compare_at_price > product.price %}
+                  <span style="text-decoration: line-through; opacity: 0.6;">{{ product.compare_at_price | money }}</span>
+                  <span style="color: #e74c3c;">{{ product.price | money }}</span>
+                {% else %}
+                  {{ product.price | money }}
+                {% endif %}
+              </div>
+            </a>
+          {% else %}
+            <div class="carousel-card" style="cursor: default;" {{ block.shopify_attributes }}>
+              <div class="carousel-card-image">
+                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
+                  {{ forloop.index }}
+                </div>
+              </div>
+              <div class="carousel-card-title">PRODUCTO {{ forloop.index }}</div>
+              <div class="carousel-card-price">$0.00</div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      
+      <button class="carousel-arrow next" aria-label="Siguiente">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const track = document.getElementById('carousel-track-{{ section.id }}');
+    const prevBtn = track.parentElement.querySelector('.carousel-arrow.prev');
+    const nextBtn = track.parentElement.querySelector('.carousel-arrow.next');
+    
+    if (!track || !prevBtn || !nextBtn) return;
+    
+    const scrollAmount = 320;
+    
+    prevBtn.addEventListener('click', () => {
+      track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    });
+    
+    {% if section.settings.show_wishlist %}
+    const wishlistButtons = track.querySelectorAll('.carousel-card-wishlist');
+    
+    wishlistButtons.forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.classList.toggle('active');
+        
+        const productId = this.dataset.productId;
+        let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        
+        if (this.classList.contains('active')) {
+          if (!wishlist.includes(productId)) wishlist.push(productId);
+        } else {
+          wishlist = wishlist.filter(id => id !== productId);
+        }
+        
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      });
+    });
+    
+    const savedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    wishlistButtons.forEach(button => {
+      if (savedWishlist.includes(button.dataset.productId)) {
+        button.classList.add('active');
+      }
+    });
+    {% endif %}
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Carousel Productos",
+  "tag": "section",
+  "class": "section-carousel",
+  "settings": [
+    {
+      "type": "header",
+      "content": "📝 Título y Subtítulo"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Título de colección"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Lorem ipsum dolor sit amet consectetur."
+    },
+    {
+      "type": "header",
+      "content": "📐 Layout"
+    },
+    {
+      "type": "range",
+      "id": "cards_per_view",
+      "label": "Tarjetas visibles por fila (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Espacio entre tarjetas",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_min_width",
+      "label": "Ancho mínimo de tarjeta",
+      "min": 120,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción de imagen",
+      "options": [
+        { "value": "1/1", "label": "Cuadrado (1:1)" },
+        { "value": "3/4", "label": "Vertical (3:4)" },
+        { "value": "4/3", "label": "Horizontal (4:3)" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Colores"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fondo de tarjetas",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Color del subtítulo",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "Tamaño del subtítulo",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Color del nombre",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "label": "Tamaño del nombre",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "card_title_weight",
+      "label": "Grosor del nombre",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "card_price_color",
+      "label": "Color del precio",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "card_price_size",
+      "label": "Tamaño del precio",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "❤️ Wishlist"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Mostrar botón favoritos",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Redondeo tarjetas",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_card",
+      "name": "Producto",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Seleccionar producto"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carousel Productos",
+      "category": "Carrusel"
+    }
+  ]
+}
+{% endschema %}

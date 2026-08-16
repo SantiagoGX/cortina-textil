@@ -1,0 +1,547 @@
+{% comment %}
+  Footer con dos contenedores separados: Beneficios (arriba) + Menu (abajo)
+  Todo en un solo archivo
+  Ubicacion: sections/footer-custom.liquid
+{% endcomment %}
+
+{%- style -%}
+  .section-{{ section.id }} {
+    --footer-outer-bg: {{ section.settings.outer_bg_color }};
+    --footer-bg: {{ section.settings.bg_color }};
+    --footer-text: {{ section.settings.text_color }};
+    --footer-border: {{ section.settings.border_color }};
+    
+    background-color: var(--footer-outer-bg, #f5f5f5);
+    padding: 20px;
+    font-family: var(--font-body-family, inherit);
+  }
+
+  .section-{{ section.id }} .footer-container {
+    width: 1512px;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Contenedor Superior - Benefits */
+  .section-{{ section.id }} .benefits-card {
+    background-color: var(--footer-bg, #ffffff);
+    color: var(--footer-text, #1a1a1a);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .section-{{ section.id }} .benefits-section {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 40px;
+    gap: 20px;
+  }
+
+  .section-{{ section.id }} .benefit-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    max-width: 200px;
+  }
+  
+  /* Clones solo visibles en movil */
+  .section-{{ section.id }} .benefit-item-clone {
+    display: none;
+  }
+
+  .section-{{ section.id }} .benefit-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+    color: var(--footer-text, #1a1a1a);
+  }
+
+  .section-{{ section.id }} .benefit-icon img,
+  .section-{{ section.id }} .benefit-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .section-{{ section.id }} .benefit-text {
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    color: var(--footer-text, #1a1a1a);
+  }
+
+  /* Contenedor Inferior - Menu & Info */
+  .section-{{ section.id }} .info-card {
+    background-color: var(--footer-bg, #ffffff);
+    color: var(--footer-text, #1a1a1a);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .section-{{ section.id }} .footer-links-section {
+    padding: 50px 60px;
+  }
+
+  .section-{{ section.id }} .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+  }
+
+  .section-{{ section.id }} .footer-column h3 {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    color: var(--footer-text, #1a1a1a);
+    opacity: 0.6;
+  }
+
+  .section-{{ section.id }} .footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .section-{{ section.id }} .footer-links li {
+    margin-bottom: 14px;
+  }
+
+  .section-{{ section.id }} .footer-links a {
+    color: var(--footer-text, #1a1a1a);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: opacity 0.2s ease;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+
+  .section-{{ section.id }} .footer-links a:hover {
+    opacity: 0.6;
+  }
+
+  .section-{{ section.id }} .footer-contact p {
+    margin: 0 0 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+
+  /* Footer Bottom */
+  .section-{{ section.id }} .footer-bottom {
+    padding: 24px 60px;
+    border-top: 1px solid var(--footer-border, #f0f0f0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .section-{{ section.id }} .footer-credits {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0.7;
+  }
+
+  .section-{{ section.id }} .footer-credits .divider {
+    width: 40px;
+    height: 1px;
+    background-color: var(--footer-text, #1a1a1a);
+    opacity: 0.3;
+  }
+
+  .section-{{ section.id }} .footer-copyright {
+    opacity: 0.7;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 989px) {
+    .section-{{ section.id }} .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px 60px;
+    }
+    
+    .section-{{ section.id }} .benefits-section {
+      padding: 30px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-{{ section.id }} {
+      padding: 12px;
+    }
+    
+    .section-{{ section.id }} .footer-container {
+      gap: 12px;
+    }
+    
+    /* Benefits scroll infinito en movil */
+    .section-{{ section.id }} .benefits-card {
+      overflow: hidden;
+    }
+    
+    .section-{{ section.id }} .benefits-section {
+      padding: 30px 0;
+      flex-wrap: nowrap;
+      gap: 0;
+      animation: scroll-benefits 20s linear infinite;
+      width: max-content;
+      justify-content: flex-start;
+    }
+    
+    .section-{{ section.id }} .benefits-section:hover {
+      animation-play-state: paused;
+    }
+
+    .section-{{ section.id }} .benefit-item {
+      flex: 0 0 auto;
+      width: 140px;
+      padding: 0 15px;
+      max-width: none;
+    }
+    
+    /* Mostrar clones en movil */
+    .section-{{ section.id }} .benefit-item-clone {
+      display: flex;
+    }
+    
+    @keyframes scroll-benefits {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+    
+    .section-{{ section.id }} .footer-links-section,
+    .section-{{ section.id }} .footer-bottom {
+      padding: 30px 24px;
+    }
+
+    .section-{{ section.id }} .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .section-{{ section.id }} .footer-bottom {
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+  }
+{%- endstyle -%}
+
+<div class="section-{{ section.id }}">
+  <div class="footer-container color-{{ section.settings.color_scheme }}">
+    
+    {%- comment %} CONTENEDOR SUPERIOR: Benefits {% endcomment -%}
+    {%- assign benefits = section.blocks | where: 'type', 'benefit' -%}
+    {%- if benefits.size > 0 -%}
+      <div class="benefits-card">
+        <div class="benefits-section">
+          {%- comment %} Primer set de beneficios {% endcomment -%}
+          {%- for block in benefits -%}
+            <div class="benefit-item" {{ block.shopify_attributes }}>
+              <div class="benefit-icon">
+                {%- if block.settings.custom_icon != blank -%}
+                  <img src="{{ block.settings.custom_icon | image_url: width: 80 }}" 
+                       alt="{{ block.settings.text | escape }}"
+                       loading="lazy"
+                       width="40"
+                       height="40">
+                {%- else -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                {%- endif -%}
+              </div>
+              <span class="benefit-text">{{ block.settings.text | escape }}</span>
+            </div>
+          {%- endfor -%}
+          {%- comment %} Segundo set duplicado para loop infinito {% endcomment -%}
+          {%- for block in benefits -%}
+            <div class="benefit-item benefit-item-clone" {{ block.shopify_attributes }}>
+              <div class="benefit-icon">
+                {%- if block.settings.custom_icon != blank -%}
+                  <img src="{{ block.settings.custom_icon | image_url: width: 80 }}" 
+                       alt="{{ block.settings.text | escape }}"
+                       loading="lazy"
+                       width="40"
+                       height="40">
+                {%- else -%}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                {%- endif -%}
+              </div>
+              <span class="benefit-text">{{ block.settings.text | escape }}</span>
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- comment %} CONTENEDOR INFERIOR: Menu & Info {% endcomment -%}
+    <div class="info-card">
+      <div class="footer-links-section">
+        <div class="footer-grid">
+          
+          <div class="footer-column">
+            <h3>{{ section.settings.col1_title | escape }}</h3>
+            <ul class="footer-links">
+              {%- for link in linklists[section.settings.col1_menu].links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h3>{{ section.settings.col2_title | escape }}</h3>
+            <ul class="footer-links">
+              {%- for link in linklists[section.settings.col2_menu].links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h3>{{ section.settings.col3_title | escape }}</h3>
+            <ul class="footer-links">
+              {%- for link in linklists[section.settings.col3_menu].links -%}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </div>
+
+          <div class="footer-column footer-contact">
+            <h3>{{ section.settings.col4_title | escape }}</h3>
+            {%- if section.settings.phone1 != blank -%}
+              <p>{{ section.settings.phone1 | escape }}</p>
+            {%- endif -%}
+            {%- if section.settings.phone2 != blank -%}
+              <p>{{ section.settings.phone2 | escape }}</p>
+            {%- endif -%}
+            {%- if section.settings.email != blank -%}
+              <p>{{ section.settings.email | escape }}</p>
+            {%- endif -%}
+          </div>
+
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-credits">
+          <span>{{ section.settings.made_with | escape }}</span>
+          <span class="divider"></span>
+          <span>{{ section.settings.designer | escape }}</span>
+        </div>
+        <div class="footer-copyright">
+          {{ section.settings.copyright | escape }} | {{ 'now' | date: '%Y' }} {{ section.settings.brand | escape }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Footer Dos Cards",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Fondo exterior"
+    },
+    {
+      "type": "color",
+      "id": "outer_bg_color",
+      "default": "#f5f5f5",
+      "label": "Color fondo exterior"
+    },
+    {
+      "type": "header",
+      "content": "Contenedores"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "default": "#ffffff",
+      "label": "Color fondo cards"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "default": "#1a1a1a",
+      "label": "Color texto"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "default": "#f0f0f0",
+      "label": "Color separadores"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        { "value": "accent-1", "label": "Acento 1" },
+        { "value": "accent-2", "label": "Acento 2" },
+        { "value": "background-1", "label": "Fondo 1" },
+        { "value": "background-2", "label": "Fondo 2" },
+        { "value": "inverse", "label": "Inverso" }
+      ],
+      "default": "background-1",
+      "label": "Esquema color"
+    },
+    {
+      "type": "header",
+      "content": "Columna 1"
+    },
+    {
+      "type": "text",
+      "id": "col1_title",
+      "default": "Mas informacion",
+      "label": "Titulo"
+    },
+    {
+      "type": "link_list",
+      "id": "col1_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Columna 2"
+    },
+    {
+      "type": "text",
+      "id": "col2_title",
+      "default": "Legales",
+      "label": "Titulo"
+    },
+    {
+      "type": "link_list",
+      "id": "col2_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Columna 3"
+    },
+    {
+      "type": "text",
+      "id": "col3_title",
+      "default": "Ayuda",
+      "label": "Titulo"
+    },
+    {
+      "type": "link_list",
+      "id": "col3_menu",
+      "label": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Contacto"
+    },
+    {
+      "type": "text",
+      "id": "col4_title",
+      "default": "Contacto",
+      "label": "Titulo"
+    },
+    {
+      "type": "text",
+      "id": "phone1",
+      "default": "(+34) 660 370 600",
+      "label": "Telefono 1"
+    },
+    {
+      "type": "text",
+      "id": "phone2",
+      "default": "(+34) 664 140 567",
+      "label": "Telefono 2"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "default": "info@manasluadventures.com",
+      "label": "Email"
+    },
+    {
+      "type": "header",
+      "content": "Pie"
+    },
+    {
+      "type": "text",
+      "id": "made_with",
+      "default": "HECHO CON AMOR POR",
+      "label": "Texto credito"
+    },
+    {
+      "type": "text",
+      "id": "designer",
+      "default": "SNC DESIGNS",
+      "label": "Disenador"
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "default": "TODOS LOS DERECHOS RESERVADOS",
+      "label": "Copyright"
+    },
+    {
+      "type": "text",
+      "id": "brand",
+      "default": "KWARA",
+      "label": "Marca"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Beneficio",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "custom_icon",
+          "label": "Icono personalizado",
+          "info": "Sube SVG o PNG (40x40px)"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "default": "30 Dias De Garantia",
+          "label": "Texto"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer Dos Cards",
+      "blocks": [
+        { "type": "benefit", "settings": { "text": "30 Dias De Garantia" } },
+        { "type": "benefit", "settings": { "text": "Hecho En Mexico A Mano" } },
+        { "type": "benefit", "settings": { "text": "Cambios Sin Costo" } },
+        { "type": "benefit", "settings": { "text": "Entrega Rapida" } },
+        { "type": "benefit", "settings": { "text": "Materiales Certificados" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,436 @@
+{% comment %}
+  Hero Section - Simplificado
+  Estructura: Section (100vw) > Container (1512px) > Content
+  Soporta: Imagen o Video de fondo
+{% endcomment %}
+
+<style>
+  /* Misma anchura que el resto del tema (sin 100vw → evita banda a la derecha) */
+  #shopify-section-{{ section.id }} {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hero-section {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 112px);
+    min-height: 420px;
+    max-height: min(90vh, 820px);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      height: clamp(200px, 48vh, 360px);
+      min-height: 200px;
+      max-height: 360px;
+    }
+  }
+
+  /* Altura fija de 450px solo en página de Contact */
+  .hero-section.hero-contact {
+    height: 450px;
+  }
+
+  /* Altura fija de 450px solo en página de Blog */
+  .hero-section.hero-blog {
+    height: 450px;
+  }
+
+  
+
+  /* Fondo de imagen - ocupa toda la section */
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  /* Fondo de video */
+  .hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .hero-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ section.settings.overlay_color | default: '#000000' }};
+    opacity: {{ section.settings.overlay_opacity | default: 40 | divided_by: 100.0 }};
+    z-index: 2;
+  }
+
+  /* CONTENEDOR PADRE - 1512px, alto automático */
+  .hero-container {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1512px;
+    margin: 0 auto;
+    padding: 96px 24px 32px 24px;
+    box-sizing: border-box;
+  }
+
+  /* CONTENEDOR HIJO - Contenido */
+  .hero-content {
+    max-width: 700px;
+  }
+
+  .hero-title {
+    color: {{ section.settings.title_color | default: '#ffffff' }};
+    font-size: {{ section.settings.title_size | default: 48 }}px;
+    font-weight: {{ section.settings.title_weight | default: 700 }};
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .hero-subtitle {
+    color: {{ section.settings.subtitle_color | default: '#ffffff' }};
+    font-size: {{ section.settings.subtitle_size | default: 18 }}px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 12px 0 0;
+    opacity: 0.95;
+  }
+
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 32px;
+    background-color: {{ section.settings.button_bg_color | default: '#A0522D' }};
+    color: {{ section.settings.button_text_color | default: '#ffffff' }};
+    font-size: {{ section.settings.button_size | default: 16 }}px;
+    font-weight: {{ section.settings.button_weight | default: 500 }};
+    text-decoration: none;
+    border-radius: 30px;
+    transition: opacity 0.3s ease;
+  }
+
+  .hero-button-icon {
+    width: {{ section.settings.button_icon_size | default: 20 }}px;
+    height: {{ section.settings.button_icon_size | default: 20 }}px;
+    flex-shrink: 0;
+    transform: translateY({{ section.settings.button_icon_offset | default: 0 }}px);
+  }
+
+  .hero-button-icon img,
+  .hero-button-icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .hero-button:hover {
+    opacity: 0.85;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section.hero-contact,
+    .hero-section.hero-blog {
+      height: clamp(200px, 40vh, 300px);
+      max-height: 300px;
+    }
+
+    .hero-container {
+      padding: 28px 20px 24px 20px;
+    }
+
+    .hero-title {
+      font-size: {{ section.settings.title_size | default: 48 | times: 0.6 }}px;
+    }
+
+    .hero-subtitle {
+      font-size: {{ section.settings.subtitle_size | default: 18 | times: 0.9 }}px;
+    }
+  }
+</style>
+
+<div class="hero-section {% if template == 'page.contact' %}hero-contact{% endif %}{% if template == 'blog' or template == 'article' %} hero-blog{% endif %}">
+  {% comment %} Fondo: Video o Imagen {% endcomment %}
+  {% if section.settings.background_type == 'video' and section.settings.video != blank %}
+    <div class="hero-video">
+      {{ section.settings.video | video_tag: 
+        autoplay: true, 
+        loop: true, 
+        muted: true, 
+        playsinline: true,
+        controls: false 
+      }}
+    </div>
+  {% elsif section.settings.image != blank %}
+    <img 
+      src="{{ section.settings.image | image_url: width: 1920 }}" 
+      alt="{{ section.settings.image.alt | escape }}"
+      class="hero-background"
+      loading="eager"
+      width="{{ section.settings.image.width }}"
+      height="{{ section.settings.image.height }}"
+    >
+  {% else %}
+    <div class="hero-background" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+  {% endif %}
+  
+  <div class="hero-overlay"></div>
+  
+  {% comment %} Contenedor padre 1512px {% endcomment %}
+  <div class="hero-container">
+    <div class="hero-content">
+      {% if section.settings.title != blank %}
+        <h1 class="hero-title">{{ section.settings.title }}</h1>
+      {% endif %}
+      
+      {% if section.settings.subtitle != blank %}
+        <p class="hero-subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+      
+      {% if section.settings.button_text != blank and section.settings.button_link != blank %}
+        <a href="{{ section.settings.button_link }}" class="hero-button">
+          {{ section.settings.button_text }}
+          {% if section.settings.button_icon != blank %}
+            <span class="hero-button-icon">
+              <img src="{{ section.settings.button_icon | image_url }}" alt="" loading="lazy">
+            </span>
+          {% endif %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hero",
+  "tag": "section",
+  "class": "section-hero",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🎨 Tipo de fondo"
+    },
+    {
+      "type": "select",
+      "id": "background_type",
+      "label": "¿Qué quieres mostrar?",
+      "options": [
+        { "value": "image", "label": "Imagen" },
+        { "value": "video", "label": "Video" }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen"
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Video",
+      "info": "Se reproduce automáticamente sin sonido"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color del overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Oscuridad del overlay",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "📝 Textos"
+    },
+    {
+      "type": "textarea",
+      "id": "title",
+      "label": "Título",
+      "default": "Telas de Señora al Mejor Precio"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Descubre nuestra colección exclusiva de telas para tus proyectos de costura"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto del botón",
+      "default": "Ver Productos"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "image_picker",
+      "id": "button_icon",
+      "label": "Icono del botón (SVG o PNG)",
+      "info": "Icono que aparece al lado derecho del texto del botón. Usar SVG o PNG de 20x20px"
+    },
+    {
+      "type": "range",
+      "id": "button_icon_size",
+      "label": "Tamaño del icono",
+      "min": 12,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "button_icon_offset",
+      "label": "Ajuste vertical del icono",
+      "min": -10,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "Usa valores negativos para subir, positivos para bajar"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Tipografía - Título"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño (px)",
+      "min": 24,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Tipografía - Subtítulo"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "Tamaño (px)",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "subtitle_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "Fino" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "🔘 Botón"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Color de fondo",
+      "default": "#A0522D"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "label": "Tamaño de letra",
+      "min": 12,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "500"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero",
+      "category": "Hero"
+    }
+  ]
+}
+{% endschema %}

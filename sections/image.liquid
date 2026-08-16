@@ -1,0 +1,346 @@
+{% comment %}
+  Image Banner Section
+  Estructura: Section (100vw) > Container (1512px) > Content
+{% endcomment %}
+
+<style>
+  #shopify-section-{{ section.id }} {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .image-banner-section {
+    position: relative;
+    width: 100%;
+    height: clamp(280px, 55vh, 900px);
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* Imagen de fondo */
+  .image-banner-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+
+  /* Overlay */
+  .image-banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: {{ section.settings.overlay_color | default: '#000000' }};
+    opacity: {{ section.settings.overlay_opacity | default: 30 | divided_by: 100.0 }};
+    z-index: 2;
+  }
+
+  /* CONTENEDOR PADRE - 1512px */
+  .image-banner-container {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1512px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    text-align: center;
+  }
+
+  /* CONTENEDOR HIJO - Contenido */
+  .image-banner-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .image-banner-title {
+    color: {{ section.settings.title_color | default: '#ffffff' }};
+    font-size: {{ section.settings.title_size | default: 36 }}px;
+    font-weight: {{ section.settings.title_weight | default: 600 }};
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .image-banner-subtitle {
+    color: {{ section.settings.subtitle_color | default: '#ffffff' }};
+    font-size: {{ section.settings.subtitle_size | default: 16 }}px;
+    font-weight: {{ section.settings.subtitle_weight | default: 400 }};
+    margin-bottom: 32px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  /* Botón */
+  .image-banner-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: {{ section.settings.button_color | default: '#ffffff' }};
+    font-size: {{ section.settings.button_size | default: 14 }}px;
+    font-weight: {{ section.settings.button_weight | default: 500 }};
+    text-decoration: none;
+    border-bottom: 1px solid {{ section.settings.button_color | default: '#ffffff' }};
+    padding-bottom: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .image-banner-button:hover {
+    gap: 12px;
+    opacity: 0.8;
+  }
+
+  .image-banner-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: {{ section.settings.button_color | default: '#ffffff' }};
+  }
+
+  /* Placeholder */
+  .image-banner-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .image-banner-section {
+      height: clamp(220px, 42vh, 420px);
+      min-height: 220px;
+    }
+
+    .image-banner-container {
+      padding: 32px 16px;
+    }
+
+    .image-banner-title {
+      font-size: {{ section.settings.title_size | default: 36 | times: 0.75 }}px;
+    }
+
+    .image-banner-subtitle {
+      font-size: {{ section.settings.subtitle_size | default: 16 | times: 0.9 }}px;
+    }
+  }
+</style>
+
+<div class="image-banner-section">
+  {% if section.settings.image != blank %}
+    <img 
+      src="{{ section.settings.image | image_url: width: 1920 }}" 
+      alt="{{ section.settings.title | escape }}"
+      class="image-banner-bg"
+      loading="lazy"
+      width="{{ section.settings.image.width }}"
+      height="{{ section.settings.image.height }}"
+    >
+  {% else %}
+    <div class="image-banner-placeholder">Agrega una imagen desde el editor</div>
+  {% endif %}
+  
+  <div class="image-banner-overlay"></div>
+  
+  <div class="image-banner-container">
+    <div class="image-banner-content">
+      {% if section.settings.title != blank %}
+        <h2 class="image-banner-title">{{ section.settings.title }}</h2>
+      {% endif %}
+      
+      {% if section.settings.subtitle != blank %}
+        <p class="image-banner-subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+      
+      {% if section.settings.button_text != blank and section.settings.button_link != blank %}
+        <a href="{{ section.settings.button_link }}" class="image-banner-button">
+          {{ section.settings.button_text }}
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Banner de Imagen",
+  "tag": "section",
+  "class": "section-image-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "🖼️ Imagen de fondo"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen"
+    },
+
+    {
+      "type": "header",
+      "content": "🎨 Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color del overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacidad del overlay",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "unit": "%",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "📝 Contenido"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Conoce Sobre Nosotros"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Lorem ipsum dolor sit amet consectetur."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto del botón",
+      "default": "Ver Productos"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Tipografía - Título"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño del título",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "header",
+      "content": "🔤 Tipografía - Subtítulo"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Color del subtítulo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "label": "Tamaño del subtítulo",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "subtitle_weight",
+      "label": "Grosor del subtítulo",
+      "options": [
+        { "value": "300", "label": "Fino" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "🔘 Botón"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del botón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "label": "Tamaño de la letra",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "label": "Grosor del botón",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semibold" }
+      ],
+      "default": "500"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner de Imagen",
+      "category": "Imagen"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,74 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "snc_about_editorial_Xz2Qp1": {
+      "type": "snc-about-editorial",
+      "blocks": {
+        "value_1": {
+          "type": "value",
+          "settings": {
+            "title": "Diseno consciente",
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fermentum gravida sem vitae porta."
+          }
+        },
+        "value_2": {
+          "type": "value",
+          "settings": {
+            "title": "Calidad duradera",
+            "text": "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam."
+          }
+        },
+        "value_3": {
+          "type": "value",
+          "settings": {
+            "title": "Comunidad",
+            "text": "Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          }
+        }
+      },
+      "block_order": [
+        "value_1",
+        "value_2",
+        "value_3"
+      ],
+      "settings": {
+        "eyebrow": "SOBRE NOSOTROS",
+        "title": "Creamos piezas con historia, no solo productos.",
+        "intro": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc luctus, lacus non gravida volutpat, augue lorem ultricies nibh, in dignissim arcu risus at erat.</p>",
+        "hero_image_alt": "Imagen principal de la marca",
+        "story_title": "Un recorrido construido con detalle y vision",
+        "story_body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sed est vel massa aliquam rutrum. Aliquam eget odio a quam fermentum pretium.</p><p>Integer sed ex ut nunc volutpat interdum. Curabitur sodales, lectus sit amet lacinia dictum, magna erat faucibus leo, ac facilisis velit augue nec lorem.</p>",
+        "side_image": "shopify://shop_images/IMG_8361.jpg",
+        "side_image_alt": "Imagen secundaria de apoyo",
+        "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus id justo sit amet neque lacinia gravida ut et nibh.",
+        "closing_image": "shopify://shop_images/IMG_8406-Mejorado-NR.jpg",
+        "closing_image_alt": "Imagen de cierre sobre nosotros",
+        "closing_title": "Seguimos escribiendo esta historia, capitulo a capitulo.",
+        "closing_text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis nec sem vitae elit auctor faucibus. Esta seccion tambien es completamente editable.",
+        "cta_label": "Conocer la coleccion",
+        "cta_link": "",
+        "max_width": 1220,
+        "padding_top": 70,
+        "padding_bottom": 90,
+        "image_radius": 8,
+        "closing_spacing_top": 120,
+        "values_columns": 3,
+        "background_color": "#f7f4ef",
+        "text_color": "#111111",
+        "muted_text_color": "#4f4f4f",
+        "accent_color": "#8a6b4f"
+      }
+    }
+  },
+  "order": [
+    "snc_about_editorial_Xz2Qp1"
+  ]
+}

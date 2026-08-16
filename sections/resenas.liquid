@@ -1,0 +1,459 @@
+{% comment %}
+  Reviews Marquee - 3 filas infinitas, todos visibles
+  Todo en un solo archivo
+  Ubicacion: sections/resenas.liquid
+{% endcomment %}
+
+{%- style -%}
+  .section-{{ section.id }} {
+    --reviews-bg: {{ section.settings.bg_color }};
+    --reviews-text: {{ section.settings.text_color }};
+    --reviews-title-size: {{ section.settings.title_size }}px;
+    --reviews-card-bg: {{ section.settings.card_bg }};
+    --reviews-card-border: {{ section.settings.card_border }};
+    --reviews-star: {{ section.settings.star_color }};
+    --reviews-avatar: {{ section.settings.avatar_size }}px;
+    --reviews-speed: {{ section.settings.speed }}s;
+    
+    background-color: var(--reviews-bg, #fff);
+    padding: 64px 0;
+    color: var(--reviews-text, #1a1a1a);
+    overflow: hidden;
+  }
+
+  .section-{{ section.id }} .reviews-header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 0 16px;
+  }
+
+  .section-{{ section.id }} .reviews-title {
+    font-family: var(--font-heading-family, inherit);
+    font-size: var(--reviews-title-size, 32px);
+    font-weight: 600;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .section-{{ section.id }} .reviews-subtitle {
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0.7;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .section-{{ section.id }} .reviews-subtitle p {
+    margin: 0;
+  }
+
+  .section-{{ section.id }} .reviews-marquee {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 12px 0;
+  }
+
+  .section-{{ section.id }} .reviews-track {
+    display: flex;
+    width: fit-content;
+    animation: marquee-{{ section.id }} var(--reviews-speed, 30s) linear infinite;
+  }
+
+  .section-{{ section.id }} .reviews-track:hover {
+    animation-play-state: paused;
+  }
+
+  .section-{{ section.id }} .reviews-marquee.row-2 .reviews-track {
+    animation-direction: reverse;
+  }
+
+  @keyframes marquee-{{ section.id }} {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .section-{{ section.id }} .review-card {
+    flex-shrink: 0;
+    width: 280px;
+    background-color: var(--reviews-card-bg, #fff);
+    border: 1px solid var(--reviews-card-border, #e5e5e5);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 0 12px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .section-{{ section.id }} .review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    z-index: 10;
+    position: relative;
+  }
+
+  .section-{{ section.id }} .review-avatar {
+    width: var(--reviews-avatar, 60px);
+    height: var(--reviews-avatar, 60px);
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 16px;
+    border: 3px solid var(--reviews-card-bg, #fff);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .section-{{ section.id }} .review-stars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .section-{{ section.id }} .review-stars svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--reviews-star, #f5a623);
+  }
+
+  .section-{{ section.id }} .review-name {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .section-{{ section.id }} .review-text {
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  .section-{{ section.id }} .reviews-marquee::before,
+  .section-{{ section.id }} .reviews-marquee::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 100px;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .section-{{ section.id }} .reviews-marquee::before {
+    left: 0;
+    background: linear-gradient(to right, var(--reviews-bg, #fff), transparent);
+  }
+
+  .section-{{ section.id }} .reviews-marquee::after {
+    right: 0;
+    background: linear-gradient(to left, var(--reviews-bg, #fff), transparent);
+  }
+
+  @media screen and (max-width: 749px) {
+    .section-{{ section.id }} {
+      padding: 48px 0;
+    }
+    
+    .section-{{ section.id }} .reviews-title {
+      font-size: calc(var(--reviews-title-size, 32px) * 0.85);
+    }
+    
+    .section-{{ section.id }} .review-card {
+      width: 260px;
+      padding: 20px;
+      margin: 0 8px;
+    }
+    
+    .section-{{ section.id }} .reviews-marquee::before,
+    .section-{{ section.id }} .reviews-marquee::after {
+      width: 50px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-{{ section.id }} .reviews-track {
+      animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      gap: 20px;
+    }
+    .section-{{ section.id }} .review-card {
+      margin: 0;
+    }
+  }
+{%- endstyle -%}
+
+<div class="section-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  
+  {%- if section.settings.show_header -%}
+    <div class="reviews-header">
+      <h2 class="reviews-title">{{ section.settings.title | escape }}</h2>
+      {%- if section.settings.subtitle != blank -%}
+        <div class="reviews-subtitle rte">{{ section.settings.subtitle }}</div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- assign reviews = section.blocks | where: 'type', 'review' -%}
+  {%- assign review_count = reviews | size -%}
+  
+  {%- if review_count > 0 -%}
+    
+    {%- comment %} Row 1 - All reviews duplicated for seamless loop {% endcomment -%}
+    <div class="reviews-marquee row-1">
+      <div class="reviews-track">
+        {%- for i in (1..2) -%}
+          {%- for block in reviews -%}
+            <div class="review-card" {{ block.shopify_attributes }}>
+              {%- if block.settings.avatar != blank -%}
+                <img src="{{ block.settings.avatar | image_url: width: 120 }}" 
+                     alt="{{ block.settings.name | escape }}" 
+                     class="review-avatar"
+                     loading="lazy"
+                     width="{{ section.settings.avatar_size }}"
+                     height="{{ section.settings.avatar_size }}">
+              {%- else -%}
+                <div class="review-avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 20px;">
+                  {{ block.settings.name | slice: 0 | upcase }}
+                </div>
+              {%- endif -%}
+              
+              <div class="review-stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>{{ block.settings.rating | default: '5.0' }}</span>
+              </div>
+              
+              <h3 class="review-name">{{ block.settings.name | escape }}</h3>
+              
+              {%- if block.settings.text != blank -%}
+                <p class="review-text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment %} Row 2 - Same reviews, reverse direction, offset start {% endcomment -%}
+    <div class="reviews-marquee row-2">
+      <div class="reviews-track">
+        {%- for i in (1..2) -%}
+          {%- for block in reviews -%}
+            <div class="review-card" {{ block.shopify_attributes }}>
+              {%- if block.settings.avatar != blank -%}
+                <img src="{{ block.settings.avatar | image_url: width: 120 }}" 
+                     alt="{{ block.settings.name | escape }}" 
+                     class="review-avatar"
+                     loading="lazy"
+                     width="{{ section.settings.avatar_size }}"
+                     height="{{ section.settings.avatar_size }}">
+              {%- else -%}
+                <div class="review-avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 20px;">
+                  {{ block.settings.name | slice: 0 | upcase }}
+                </div>
+              {%- endif -%}
+              
+              <div class="review-stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>{{ block.settings.rating | default: '5.0' }}</span>
+              </div>
+              
+              <h3 class="review-name">{{ block.settings.name | escape }}</h3>
+              
+              {%- if block.settings.text != blank -%}
+                <p class="review-text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment %} Row 3 - Same reviews, forward direction, different offset {% endcomment -%}
+    <div class="reviews-marquee row-3">
+      <div class="reviews-track">
+        {%- for i in (1..2) -%}
+          {%- for block in reviews -%}
+            <div class="review-card" {{ block.shopify_attributes }}>
+              {%- if block.settings.avatar != blank -%}
+                <img src="{{ block.settings.avatar | image_url: width: 120 }}" 
+                     alt="{{ block.settings.name | escape }}" 
+                     class="review-avatar"
+                     loading="lazy"
+                     width="{{ section.settings.avatar_size }}"
+                     height="{{ section.settings.avatar_size }}">
+              {%- else -%}
+                <div class="review-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 20px;">
+                  {{ block.settings.name | slice: 0 | upcase }}
+                </div>
+              {%- endif -%}
+              
+              <div class="review-stars">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>{{ block.settings.rating | default: '5.0' }}</span>
+              </div>
+              
+              <h3 class="review-name">{{ block.settings.name | escape }}</h3>
+              
+              {%- if block.settings.text != blank -%}
+                <p class="review-text">{{ block.settings.text | escape }}</p>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+  {%- endif -%}
+
+</div>
+
+{% schema %}
+{
+  "name": "Resenas 3 Filas",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_header",
+      "default": true,
+      "label": "Mostrar encabezado"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Resenas",
+      "label": "Titulo"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "default": "<p>Lorem ipsum dolor sit amet consectetur.</p>",
+      "label": "Subtitulo"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamano titulo",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "default": "#ffffff",
+      "label": "Color fondo"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "default": "#1a1a1a",
+      "label": "Color texto"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "default": "#ffffff",
+      "label": "Color tarjeta"
+    },
+    {
+      "type": "color",
+      "id": "card_border",
+      "default": "#e5e5e5",
+      "label": "Color borde"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "default": "#f5a623",
+      "label": "Color estrella"
+    },
+    {
+      "type": "range",
+      "id": "avatar_size",
+      "min": 40,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Tamano avatar",
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        { "value": "accent-1", "label": "Acento 1" },
+        { "value": "accent-2", "label": "Acento 2" },
+        { "value": "background-1", "label": "Fondo 1" },
+        { "value": "background-2", "label": "Fondo 2" },
+        { "value": "inverse", "label": "Inverso" }
+      ],
+      "default": "background-1",
+      "label": "Esquema color"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Velocidad",
+      "default": 30
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Resena",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "avatar",
+          "label": "Avatar"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "default": "Wade Warren",
+          "label": "Nombre"
+        },
+        {
+          "type": "text",
+          "id": "rating",
+          "default": "4.75",
+          "label": "Calificacion"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "default": "Awesome website and funnel",
+          "label": "Texto"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Resenas 3 Filas",
+      "category": "Texto",
+      "blocks": [
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" },
+        { "type": "review" }
+      ]
+    }
+  ]
+}
+{% endschema %}

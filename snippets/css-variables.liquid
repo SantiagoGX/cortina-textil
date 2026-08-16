@@ -1,0 +1,16 @@
+{% style %}
+  {% # FUENTE INTER - FORZADA EN TODO EL SITIO %}
+  
+  :root {
+    --font-primary--family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-primary--style: normal;
+    --font-primary--weight: 400;
+    --font-heading-family: 'Lato', sans-serif;
+    --font-body-family: 'Lato', sans-serif;
+    --page-width: {{ settings.max_page_width }};
+    --page-margin: {{ settings.min_page_margin }}px;
+    --color-background: {{ settings.background_color }};
+    --color-foreground: {{ settings.foreground_color }};
+    --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
+  }
+{% endstyle %}

@@ -1,0 +1,77 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero_63Af6h": {
+      "type": "hero",
+      "name": "Hero",
+      "settings": {
+        "background_type": "image",
+        "image": "shopify://shop_images/319f6c08dcdbf310966142f6e59760cbd3053985.jpg",
+        "overlay_color": "#000000",
+        "overlay_opacity": 40,
+        "title": "Contáctanos",
+        "subtitle": "Lorem ipsum dolor sit.",
+        "button_text": "",
+        "button_link": "",
+        "button_icon_size": 20,
+        "button_icon_offset": 0,
+        "title_color": "#ffffff",
+        "title_size": 60,
+        "title_weight": "700",
+        "subtitle_color": "#ffffff",
+        "subtitle_size": 22,
+        "subtitle_weight": "400",
+        "button_bg_color": "#a0522d",
+        "button_text_color": "#ffffff",
+        "button_size": 16,
+        "button_weight": "500"
+      }
+    },
+    "contact_AtwHRN": {
+      "type": "contact",
+      "name": "Contacto",
+      "settings": {
+        "bg_color": "#f0f0f0",
+        "input_bg": "#ffffff",
+        "info_bg": "#ffffff",
+        "title": "¡Queremos Escucharte!",
+        "subtitle": "Deja tu mensaje en el formulario y una persona de nuestro equipo te responderá lo antes posible con nosotros.",
+        "title_color": "#000000",
+        "subtitle_color": "#666666",
+        "title_size": 36,
+        "subtitle_size": 16,
+        "name_placeholder": "Nombre",
+        "email_placeholder": "Email",
+        "message_placeholder": "Mensaje",
+        "button_text": "Enviar",
+        "button_bg": "#7b4a2f",
+        "button_color": "#ffffff",
+        "placeholder_color": "#999999",
+        "input_radius": 8,
+        "button_radius": 25,
+        "info1_label": "Atención Al Cliente",
+        "info1_value": "info@empresa.com",
+        "info2_label": "Lunes A Viernes",
+        "info2_value": "10:00 am - 7:00 pm",
+        "info3_label": "Sábados",
+        "info3_value": "10:00 am - 2:00 pm",
+        "info_label_color": "#666666",
+        "info_value_color": "#000000",
+        "divider_color": "#dddddd",
+        "info_radius": 12
+      }
+    }
+  },
+  "order": [
+    "hero_63Af6h",
+    "contact_AtwHRN"
+  ]
+}
